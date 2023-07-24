@@ -1,0 +1,18 @@
+Capstone Proposal
+
+	The goal of the website will be to allow users to search for cocktails sourced from The Cocktail DB api.  
+    Users will be able to store favorites and leave comments on recipes. The demographic of my intended users is 
+    ages 21+ that are interested in making and trying out new recipes. With the Cocktail DB I plan to store 
+    cocktail photos, titles, ingredients and instructions. I’ll also be storing user data for login and favorites/comments.
+	
+    The database will have tables for cocktails, users, favorites and comments. The favorites table will 
+    reference a cocktail foreign key and a user foreign key, the comments table will do the same. 
+    My initial plan is to populate the database using the api and limit calls after that – possibly once 
+    a week or whatever in case there is something added. User passwords will be stored using bcrypt so the actual 
+    password isn’t available. A stretch goal would be to allow users to share particular cocktails, whether internally 
+    or externally.
+
+	Users will initially be prompted to register/login and then will be redirected to the homepage where the most popular 
+    cocktails will be displayed. From there users can search using various methods, or they can click on a recipe that will 
+    open up a more detailed page. There they can see everything required and comments left by other users. There will also 
+    be a user page for everybody with basic info and any recipes they have marked as favorites for easy viewing later.
