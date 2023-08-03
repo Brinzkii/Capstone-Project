@@ -1,6 +1,9 @@
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
+bcrypt = Bcrypt()
+db = SQLAlchemy()
+
 
 def connect_db(app):
     """Connect this database to provided Flask app.
@@ -10,10 +13,6 @@ def connect_db(app):
 
     db.app = app
     db.init_app(app)
-
-
-bcrypt = Bcrypt()
-db = SQLAlchemy()
 
 
 class User(db.Model):
@@ -71,6 +70,8 @@ class Drink(db.Model):
 
     name = db.Column(db.String, unique=True)
 
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+
     glass_id = db.Column(db.Integer, db.ForeignKey('glasses.id'))
 
     instructions = db.Column(db.String, nullable=False)
@@ -80,6 +81,10 @@ class Drink(db.Model):
     main_img = db.Column(db.String)
 
     video = db.Column(db.String)
+
+    category = db.relationship('Category', backref='drinks')
+
+    glass = db.relationship('Glass', backref='drinks')
 
 
 class Ingredient(db.Model):
@@ -91,21 +96,27 @@ class Ingredient(db.Model):
 
     name = db.Column(db.String, unique=True)
 
-    description = db.Column(db.String, nullable=False)
+    description = db.Column(db.String)
 
-    abv = db.Column(db.String)
+    abv = db.Column(db.String, default='N/A')
 
-    sm_img = db.Column(db.String)
-
-    md_img = db.Column(db.String)
-
-    lg_img = db.Column(db.String)
+    img = db.Column(db.String)
 
 
 class Glass(db.Model):
     """Drink glass class model"""
 
     __tablename__ = 'glasses'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    name = db.Column(db.String, unique=True)
+
+
+class Category(db.Model):
+    """Drink categories class model"""
+
+    __tablename__ = 'categories'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
@@ -119,11 +130,17 @@ class DrinkIngredients(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    drink_id = db.Column(db.Integer, db.ForeignKey('drinks.id'))
+    drink_id = db.Column(db.Integer, db.ForeignKey(
+        'drinks.id', ondelete='CASCADE'))
 
-    ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredients.id'))
+    ingredient_id = db.Column(db.Integer, db.ForeignKey(
+        'ingredients.id', ondelete='CASCADE'))
 
     measurement = db.Column(db.String, nullable=False)
+
+    drink = db.relationship('Drink', backref='ingredients')
+
+    ingredient = db.Relationship('Ingredient', backref='drinks')
 
 
 class Favorite(db.Model):
@@ -133,9 +150,13 @@ class Favorite(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'users.id', ondelete='CASCADE'))
 
-    drink_id = db.Column(db.Integer, db.ForeignKey('drinks.id'))
+    drink_id = db.Column(db.Integer, db.ForeignKey(
+        'drinks.id', ondelete='CASCADE'))
+
+    user = db.relationship('User', backref='favorites')
 
 
 class Comment(db.Model):
@@ -145,8 +166,12 @@ class Comment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'users.id', ondelete='CASCADE'))
 
-    drink_id = db.Column(db.Integer, db.ForeignKey('drinks.id'))
+    drink_id = db.Column(db.Integer, db.ForeignKey(
+        'drinks.id', ondelete='CASCADE'))
 
     comment = db.Column(db.String, nullable=False)
+
+    user = db.relationship('User', backref='comments')
