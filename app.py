@@ -15,7 +15,7 @@ app.config["SECRET_KEY"] = 'password'
 
 connect_db(app)
 
-#################################### Routes ####################################
+#################################### User Routes ####################################
 
 
 @app.before_request
@@ -64,7 +64,7 @@ def signup_user():
             flash(f"Welcome to the club, {user.username}!", 'success')
             return redirect('/')
         except IntegrityError:
-            flash('Sorry, that username is already taken!', 'error')
+            flash('Sorry, that username is already taken!', 'danger')
             return render_template('signup.html', form=form)
     else:
         return render_template('signup.html', form=form)
@@ -84,7 +84,7 @@ def login_user():
             flash(f'Welcome back, {user.username}!', 'success')
             return redirect('/')
         except:
-            flash('Sorry, please try again!', 'error')
+            flash('Sorry, please try again!', 'danger')
             return render_template('login.html', form=form)
     else:
         return render_template('login.html', form=form)
@@ -95,5 +95,26 @@ def logout_user():
     """Log a user out"""
 
     sess_logout()
-    flash(f'{g.user.username} has now been logged out!', 'success')
+    flash(f'{g.user.username} has now been logged out.', 'warning')
     return redirect('/')
+
+#################################### Drink Routes ####################################
+
+
+@app.route('/drinks')
+def show_drinks():
+    """Show all drinks in database"""
+
+    drinks = Drink.query.all()
+
+    return render_template('drinks.html', drinks=drinks)
+
+
+@app.route('/<int:drink_id>')
+def show_drink_details(drink_id):
+    """Show details for a specific drink"""
+
+    drink = Drink.query.get_or_404(drink_id)
+    ingredients = drink.ingredients
+
+    return render_template('drink-details.html', drink=drink, ingredients=ingredients, Ingredient=Ingredient)

@@ -1,0 +1,22 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+    <h2 class="text-center">{{drink.name}}</h2>
+
+    <img src="{{drink.main_img}}" alt="" class="text-center">
+    <h5>Category: {{drink.category.name}}</h5>
+    <h5>Glass: {{drink.glass.name}}</h5>
+    {% if drink.video %}
+    <h5><a href="{{drink.video}}">Video link</a></h5>
+    {% endif %}
+    <ul>
+        {% for ingredient in ingredients %}
+            {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
+            <li>{{i.name}} - {{ingredient.measurement}}</li>
+        {% endfor %}
+    </ul>
+    <p>Instructions: {{drink.instructions}}</p>
+
+</div>
+
+{% endblock %}
