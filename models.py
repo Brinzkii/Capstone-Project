@@ -68,13 +68,15 @@ class Drink(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
+    api_id = db.Column(db.Integer, unique=True)
+
     name = db.Column(db.String, unique=True)
 
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
 
     glass_id = db.Column(db.Integer, db.ForeignKey('glasses.id'))
 
-    instructions = db.Column(db.String, nullable=False)
+    instructions = db.Column(db.String)
 
     thumbnail = db.Column(db.String)
 
@@ -136,7 +138,7 @@ class DrinkIngredients(db.Model):
     ingredient_id = db.Column(db.Integer, db.ForeignKey(
         'ingredients.id', ondelete='CASCADE'))
 
-    measurement = db.Column(db.String, nullable=False)
+    measurement = db.Column(db.String, default='Personal preference')
 
     drink = db.relationship('Drink', backref='ingredients')
 

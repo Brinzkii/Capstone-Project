@@ -1,13 +1,15 @@
 
 from app import app
 from models import Drink, Ingredient, Glass, Category, DrinkIngredients, db
+from time import sleep
+import random
 import requests
 
 base_url = 'https://www.thecocktaildb.com/api/json/v1/1/'
 
-# with app.app_context():
-#     db.drop_all()
-#     db.create_all()
+with app.app_context():
+    db.drop_all()
+    db.create_all()
 
 # Seed database with data from CocktailAPI
 
@@ -84,54 +86,168 @@ def add_all_drinks():
             drinks = resp.json()
 
             # Get the details of each drink in the list we just received
-            for drink in drinks['drinks']:
-                resp = requests.get(base_url + 'search.php',
-                                    params={'s': f"{drink['strDrink']}"})
-                details = resp.json()
+            count = 0
+            while count <= len(drinks['drinks']) - 1:
 
-                with app.app_context():
-                    # Find the drinks glass in our DB
-                    glass = Glass.query.filter_by(
-                        name=details['drinks'][0]['strGlass'].title()).first()
+                # Create drink object
+                d = Drink(
+                    name=drinks['drinks'][count]['strDrink'],
+                    api_id=drinks['drinks'][count]['idDrink'],
+                    category_id=category.id,
+                    thumbnail=f"{drinks['drinks'][count]['strDrinkThumb']}/preview",
+                    main_img=drinks['drinks'][count]['strDrinkThumb'],
+                )
 
-                    # Create drink object
-                    d = Drink(
-                        name=details['drinks'][0]['strDrink'],
-                        category_id=category.id,
-                        glass_id=glass.id,
-                        instructions=details['drinks'][0]['strInstructions'],
-                        thumbnail=f"{details['drinks'][0]['strDrinkThumb']}/preview",
-                        main_img=details['drinks'][0]['strDrinkThumb'],
-                        video=details['drinks'][0]['strVideo']
-                    )
+                count += 1
 
-                    db.session.add(d)
+                db.session.add(d)
+                db.session.commit()
+
+
+def add_drink_ingredients(category_id):
+    """
+    Create an entry for each ingredient tying ingredient to drink with measurement and 
+    add missing details to drinks.
+
+    Must call one category at a time or the api locks up
+    """
+
+    with app.app_context():
+        drinks = Drink.query.filter_by(category_id=category_id).all()
+        progress = 0
+
+        # Get detailed info for each drink in database via API and update missing info
+        for drink in drinks:
+            try:
+                resp = requests.get(base_url + 'lookup.php', params={
+                    'i': f'{drink.api_id}'
+                })
+            except:
+                print('API is mad - waiting 5 seconds')
+                sleep(5)
+
+                resp = requests.get(base_url + 'lookup.php', params={
+                    'i': f'{drink.api_id}'
+                })
+
+            # Add delay to prevent API from locking up
+            sleep(random.uniform(2.00, 4.50))
+
+            details = resp.json()
+            data = details['drinks'][0]
+            glass = Glass.query.filter_by(
+                name=data['strGlass'].title()).first()
+
+            drink.video = data['strVideo']
+            drink.glass_id = glass.id
+            drink.instructions = data['strInstructions']
+
+            progress += 1
+            print(
+                f"""
+#################  {drink.category.name} ({drink.category.id}/{len(Category.query.all())})  #################
+                    
+                    Progress: {progress}/{len(drinks)}
+-------------------------------------------------------------
+                """)
+
+            # Loop through ingredients and create pairs in DB, adding ingredients if they are missing
+            count = 1
+            while data[f'strIngredient{count}'] != None:
+                ingredient = Ingredient.query.filter_by(
+                    name=data[f'strIngredient{count}'].title()).first()
+
+                if ingredient == None:
+                    i = Ingredient(name=data[f'strIngredient{count}'].title())
+
+                    db.session.add(i)
                     db.session.commit()
 
-                    add_drink_ingredients(details['drinks'][0], d)
+                    d_i = DrinkIngredients(
+                        drink_id=drink.id, ingredient_id=i.id, measurement=data[f'strMeasure{count}'])
 
-                    # For each ingredient create a new drink-ingredient entry with measurement
+                    db.session.add(d_i)
+                else:
+                    d_i = DrinkIngredients(
+                        drink_id=drink.id, ingredient_id=ingredient.id, measurement=data[f'strMeasure{count}'])
 
+                    db.session.add(d_i)
 
-def add_drink_ingredients(drink_resp, drink):
-    """Create an entry for each ingredient tying ingredient to drink with measurement"""
+                db.session.commit()
 
-    count = 1
-    i = drink_resp[f'strIngredient{count}']
-    if i != None:
-        ingredient = Ingredient.query.filter_by(
-            name=i.title()).first()
-        d_i = DrinkIngredients(
-            drink_id=drink.id,
-            ingredient_id=ingredient.id,
-            measurement=drink_resp[f'strMeasure{count}']
-        )
-
-        db.session.add(d_i)
-        db.session.commit()
-        count += 1
+                count += 1
 
 
-# add_categories()
-# add_glasses()
-# add_ingredients()
+add_categories()
+
+print('Categories successfully stored - glasses will begin in 30 seconds')
+sleep(30)
+
+add_glasses()
+
+print('Glasses successfully stored - ingredients will begin in 30 seconds')
+sleep(30)
+
+add_ingredients()
+
+print('Ingredients successfully stored - drinks will begin in 30 seconds')
+sleep(30)
+
+add_all_drinks()
+
+print('Drinks successfully stored - the first category of drink details and ingredients will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(1)
+
+print('Category 1 drink details and ingredients successfully stored - category 2 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(2)
+
+print('Category 2 drink details and ingredients successfully stored - category 3 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(3)
+
+print('Category 3 drink details and ingredients successfully stored - category 4 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(4)
+
+print('Category 4 drink details and ingredients successfully stored - category 5 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(5)
+
+print('Category 5 drink details and ingredients successfully stored - category 6 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(6)
+
+print('Category 6 drink details and ingredients successfully stored - category 7 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(7)
+
+print('Category 7 drink details and ingredients successfully stored - category 8 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(8)
+
+print('Category 8 drink details and ingredients successfully stored - category 9 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(9)
+
+print('Category 9 drink details and ingredients successfully stored - category 10 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(10)
+
+print('Category 10 drink details and ingredients successfully stored - category 11 will begin in 30 seconds')
+sleep(30)
+
+add_drink_ingredients(11)
+
+print('All drink details and ingredients successfully stored - database has now been populated!')
