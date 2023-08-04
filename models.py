@@ -30,7 +30,7 @@ class User(db.Model):
 
     password = db.Column(db.String, nullable=False)
 
-    profile_img = db.Column(db.String, default='/static/images/profile')
+    profile_img = db.Column(db.String, default='/static/images/profile.png')
 
     @classmethod
     def signup(cls, username, password, profile_img):
@@ -38,11 +38,17 @@ class User(db.Model):
 
         hashed = bcrypt.generate_password_hash(password).decode('UTF-8')
 
-        user = User(
-            username=username,
-            password=hashed,
-            profile_img=profile_img
-        )
+        if profile_img:
+            user = User(
+                username=username,
+                password=hashed,
+                profile_img=profile_img
+            )
+        else:
+            user = User(
+                username=username,
+                password=hashed,
+            )
 
         db.session.add(user)
         return (user)
@@ -51,7 +57,7 @@ class User(db.Model):
     def authenticate(cls, username, password):
         """Checks database for existing user and compares against hashed password"""
 
-        user = cls.query.filter_by(username=username)
+        user = cls.query.filter_by(username=username).first()
 
         if user:
             is_auth = bcrypt.check_password_hash(user.password, password)

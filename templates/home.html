@@ -1,5 +1,13 @@
 {% extends 'base.html' %} {% block content %}
 
+{% if g.user %}
+
+<h2 class="text-center mt-4">Drink of the Day</h2>
+
+{% else %}
+
 <h2 class="text-center mt-4">Welcome to Underground Mixology!</h2>
+
+{% endif %}
 
 {% endblock %}
