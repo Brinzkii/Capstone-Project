@@ -18,6 +18,14 @@ connect_db(app)
 #################################### User Routes ####################################
 
 
+@app.context_processor
+def inject_categories():
+    """Make categories available in base template for use in header"""
+
+    categories = Category.query.order_by(Category.name).all()
+    return dict(categories=categories)
+
+
 @app.before_request
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
@@ -107,7 +115,7 @@ def show_drinks():
 
     drinks = Drink.query.all()
 
-    return render_template('drinks.html', drinks=drinks)
+    return render_template('drinks.html', drinks=drinks, title='All Drinks')
 
 
 @app.route('/<int:drink_id>')
@@ -118,3 +126,13 @@ def show_drink_details(drink_id):
     ingredients = drink.ingredients
 
     return render_template('drink-details.html', drink=drink, ingredients=ingredients, Ingredient=Ingredient)
+
+
+@app.route('/drinks/<int:category_id>')
+def show_category_drinks(category_id):
+    """Show all drinks in a category"""
+
+    category = Category.query.get_or_404(category_id)
+    drinks = category.drinks
+
+    return render_template('drinks.html', drinks=drinks, title=f"{category.name}")

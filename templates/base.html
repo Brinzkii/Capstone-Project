@@ -43,19 +43,12 @@
                 <a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Categories</a>
                 <div class="dropdown-menu">
                   
-                  <a class="dropdown-item" href="#">Beer</a>
-                  <a class="dropdown-item" href="#">Cocktail</a>
-                  <a class="dropdown-item" href="#">Cocoa</a>
-                  <a class="dropdown-item" href="#">Coffee / Tea</a>
-                  <a class="dropdown-item" href="#">Homemade Liqueur</a>
-                  <a class="dropdown-item" href="#">Ordinary Drink</a>
-                  <a class="dropdown-item" href="#">Punch / Party Drink</a>
-                  <a class="dropdown-item" href="#">Shake</a>
-                  <a class="dropdown-item" href="#">Shot</a>
-                  <a class="dropdown-item" href="#">Soft Drink</a>
-                  <a class="dropdown-item" href="#">Other / Unknown</a>
-                  <!-- <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Separated link</a> -->
+                  {% for category in categories %}
+
+                  <a class="dropdown-item" href="/drinks/{{category.id}}">{{category.name}}</a>
+
+                  {% endfor %}
+
                 </div>
               </li>
             </ul>
