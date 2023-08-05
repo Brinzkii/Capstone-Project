@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect, session, g
 from sqlalchemy.exc import IntegrityError
 from models import connect_db, db, User, User, Drink, Ingredient, DrinkIngredients, Glass, Category, Favorite, Comment
-from forms import SignupForm, LoginForm
+from forms import SignupForm, LoginForm, SearchForm
 
 app = Flask(__name__)
 
@@ -24,6 +24,14 @@ def inject_categories():
 
     categories = Category.query.order_by(Category.name).all()
     return dict(categories=categories)
+
+
+@app.context_processor
+def inject_search_form():
+    """Make search form available in base template for use in header"""
+
+    search_form = SearchForm()
+    return dict(search_form=search_form)
 
 
 @app.before_request
@@ -113,7 +121,7 @@ def logout_user():
 def show_drinks():
     """Show all drinks in database"""
 
-    drinks = Drink.query.all()
+    drinks = Drink.query.order_by(Drink.name).all()
 
     return render_template('drinks.html', drinks=drinks, title='All Drinks')
 
@@ -136,3 +144,42 @@ def show_category_drinks(category_id):
     drinks = category.drinks
 
     return render_template('drinks.html', drinks=drinks, title=f"{category.name}")
+
+
+@app.route('/search', methods=['POST'])
+def show_search_results():
+    """Query database for any matching drinks, ingredients, categories and display results"""
+
+    form = SearchForm()
+    results = []
+
+    if form.validate_on_submit():
+        q = form.search.data
+        # First search for any matching ingredients
+        ingredients = Ingredient.query.filter(db.or_(
+            Ingredient.name.like(f'%{q}%'), Ingredient.name.like(f'{q}%'), Ingredient.name.like(f'%{q}'))).all()
+        # Then add each of the drinks containing that ingredient to results array
+        if ingredients:
+            for ingredient in ingredients:
+                for drink in ingredient.drinks:
+                    results.append(drink.drink)
+
+        # Search for any matching categories
+        categories = Category.query.filter(db.or_(
+            Category.name.like(f'%{q}%'), Category.name.like(f'{q}%'), Category.name.like(f'%{q}'))).all()
+        # Add drinnks in matching category to results
+        if categories:
+            for category in categories:
+                results.append(category.drinks)
+
+        # Search for any matching drinks and add to results
+        drinks = Drink.query.filter(db.or_(
+            Drink.name.like(f'%{q}%'), Drink.name.like(f'{q}%'), Drink.name.like(f'%{q}'))).all()
+        if drinks:
+            for drink in drinks:
+                results.append(drink)
+
+        return render_template('drinks.html', drinks=results, title=f"Search Results for '{q}'")
+    else:
+        flash('Something went wrong, please try again!', 'warning')
+        return redirect('/')
