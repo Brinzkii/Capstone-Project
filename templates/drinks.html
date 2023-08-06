@@ -3,19 +3,22 @@
 <h2 class="text-center mt-2">{{title}}</h2>
 
 <div class="container-fluid d-flex flex-wrap justify-content-around" style="width: 100%">
+	{% for drink in drinks %}
 
-    {% for drink in drinks %}
+	<div class="card bg-light text-dark col-5 mt-4 ml-1 mr-1">
+		<div class="card-body pl-0 pr-0">
+			{% if g.user %}
+			<!-- <button class="btn btn-outline-primary fav-btn"><i class="bi bi-heart"></i></button> -->
+			<i class="bi bi-heart"></i>
+			{% endif %}
+			<h5 class="card-title text-center">{{drink.name}}</h5>
+			<h6 class="card-subtitle text-center"><small>({{drink.category.name}})</small></h6>
+		</div>
+		<img src="{{drink.main_img}}" class="card-img-bottom" alt="#" />
+		<a href="/{{drink.id}}" class="btn btn-info mt-2 mb-2">Details</a>
+	</div>
 
-    <div class="card bg-light text-dark col-5 mt-4 ml-1 mr-1">
-        <div class="card-body">
-          <h5 class="card-title text-center">{{drink.name}}</h5>
-          <h6 class="card-subtitle text-center"><small>({{drink.category.name}})</small></h6>
-        </div>
-        <img src="{{drink.main_img}}" class="card-img-bottom" alt="#">
-        <a href="/{{drink.id}}" class="btn btn-info mt-2 mb-2">Details</a>
-      </div>
-
-    {% endfor %}
+	{% endfor %}
 </div>
 
 {% endblock %}
