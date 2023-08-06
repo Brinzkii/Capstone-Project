@@ -22,7 +22,7 @@ class User(db.Model):
     Adds user to session but does not commit for you
     """
 
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
@@ -30,20 +30,16 @@ class User(db.Model):
 
     password = db.Column(db.String, nullable=False)
 
-    profile_img = db.Column(db.String, default='/static/images/profile.png')
+    profile_img = db.Column(db.String, default="/static/images/profile.png")
 
     @classmethod
     def signup(cls, username, password, profile_img):
         """Sign up a new user"""
 
-        hashed = bcrypt.generate_password_hash(password).decode('UTF-8')
+        hashed = bcrypt.generate_password_hash(password).decode("UTF-8")
 
         if profile_img:
-            user = User(
-                username=username,
-                password=hashed,
-                profile_img=profile_img
-            )
+            user = User(username=username, password=hashed, profile_img=profile_img)
         else:
             user = User(
                 username=username,
@@ -51,7 +47,7 @@ class User(db.Model):
             )
 
         db.session.add(user)
-        return (user)
+        return user
 
     @classmethod
     def authenticate(cls, username, password):
@@ -70,7 +66,7 @@ class User(db.Model):
 class Drink(db.Model):
     """Drink class model"""
 
-    __tablename__ = 'drinks'
+    __tablename__ = "drinks"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
@@ -78,9 +74,9 @@ class Drink(db.Model):
 
     name = db.Column(db.String, unique=True)
 
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
 
-    glass_id = db.Column(db.Integer, db.ForeignKey('glasses.id'))
+    glass_id = db.Column(db.Integer, db.ForeignKey("glasses.id"))
 
     instructions = db.Column(db.String)
 
@@ -90,15 +86,15 @@ class Drink(db.Model):
 
     video = db.Column(db.String)
 
-    category = db.relationship('Category', backref='drinks')
+    category = db.relationship("Category", backref="drinks")
 
-    glass = db.relationship('Glass', backref='drinks')
+    glass = db.relationship("Glass", backref="drinks")
 
 
 class Ingredient(db.Model):
     """Ingredient class model"""
 
-    __tablename__ = 'ingredients'
+    __tablename__ = "ingredients"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
@@ -106,7 +102,7 @@ class Ingredient(db.Model):
 
     description = db.Column(db.String)
 
-    abv = db.Column(db.String, default='N/A')
+    abv = db.Column(db.String, default="N/A")
 
     img = db.Column(db.String)
 
@@ -114,7 +110,7 @@ class Ingredient(db.Model):
 class Glass(db.Model):
     """Drink glass class model"""
 
-    __tablename__ = 'glasses'
+    __tablename__ = "glasses"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
@@ -124,7 +120,7 @@ class Glass(db.Model):
 class Category(db.Model):
     """Drink categories class model"""
 
-    __tablename__ = 'categories'
+    __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
@@ -134,52 +130,48 @@ class Category(db.Model):
 class DrinkIngredients(db.Model):
     """Ties ingredients and their measurements to specific cocktails"""
 
-    __tablename__ = 'drink_ingredients'
+    __tablename__ = "drink_ingredients"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    drink_id = db.Column(db.Integer, db.ForeignKey(
-        'drinks.id', ondelete='CASCADE'))
+    drink_id = db.Column(db.Integer, db.ForeignKey("drinks.id", ondelete="CASCADE"))
 
-    ingredient_id = db.Column(db.Integer, db.ForeignKey(
-        'ingredients.id', ondelete='CASCADE'))
+    ingredient_id = db.Column(
+        db.Integer, db.ForeignKey("ingredients.id", ondelete="CASCADE")
+    )
 
-    measurement = db.Column(db.String, default='Personal preference')
+    measurement = db.Column(db.String, default="Personal preference")
 
-    drink = db.relationship('Drink', backref='ingredients')
+    drink = db.relationship("Drink", backref="ingredients")
 
-    ingredient = db.Relationship('Ingredient', backref='drinks')
+    ingredient = db.Relationship("Ingredient", backref="drinks")
 
 
 class Favorite(db.Model):
     """Model for tracking users favorite drinks"""
 
-    __tablename__ = 'favorites'
+    __tablename__ = "favorites"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id', ondelete='CASCADE'))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"))
 
-    drink_id = db.Column(db.Integer, db.ForeignKey(
-        'drinks.id', ondelete='CASCADE'))
+    drink_id = db.Column(db.Integer, db.ForeignKey("drinks.id", ondelete="CASCADE"))
 
-    user = db.relationship('User', backref='favorites')
+    user = db.relationship("User", backref="favorites")
 
 
 class Comment(db.Model):
     """Model for tracking users favorite drinks"""
 
-    __tablename__ = 'comments'
+    __tablename__ = "comments"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id', ondelete='CASCADE'))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"))
 
-    drink_id = db.Column(db.Integer, db.ForeignKey(
-        'drinks.id', ondelete='CASCADE'))
+    drink_id = db.Column(db.Integer, db.ForeignKey("drinks.id", ondelete="CASCADE"))
 
     comment = db.Column(db.String, nullable=False)
 
-    user = db.relationship('User', backref='comments')
+    user = db.relationship("User", backref="comments")
