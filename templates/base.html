@@ -37,15 +37,6 @@
 								<a class="nav-link text-dark" href="/profile/{{g.user.id}}">Profile </a>
 							</li>
 
-							{% else %}
-
-							<li class="nav-item">
-								<a class="nav-link text-dark" href="/login">Login </a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link text-dark" href="/signup">Signup</a>
-							</li>
-
 							{% endif %}
 							<li class="nav-item">
 								<a class="nav-link text-dark" href="/drinks">Drinks</a>
@@ -70,8 +61,8 @@
 							</li>
 						</ul>
 					</div>
-					<div class="container-fluid justify-content-end">
-						<form method="POST" id="search_form" action="/search" class="form-inline">
+					<div class="container-fluid justify-content-end flex-nowrap">
+						<form method="POST" id="search_form" action="/search" class="form-inline flex-shrink-1">
 							{{ search_form.hidden_tag() }} {% for field in search_form if field.widget.input_type !=
 							'hidden' %} {% for error in field.errors %}
 							<span class="text-danger">{{ error }}</span>
@@ -84,6 +75,16 @@
 
 						<li>
 							<a href="/logout" class="btn btn-warning text-center">Logout</a>
+						</li>
+
+						{% else %}
+
+						<li>
+							<a href="/login" class="btn btn-success text-center">Login</a>
+						</li>
+
+						<li>
+							<a href="/signup" class="btn btn-info text-center">Signup</a>
 						</li>
 
 						{% endif %}
