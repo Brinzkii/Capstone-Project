@@ -144,7 +144,7 @@ class DrinkIngredients(db.Model):
 
     drink = db.relationship("Drink", backref="ingredients")
 
-    ingredient = db.Relationship("Ingredient", backref="drinks")
+    ingredient = db.relationship("Ingredient", backref="drinks")
 
 
 class Favorite(db.Model):
@@ -160,7 +160,7 @@ class Favorite(db.Model):
 
     user = db.relationship("User", backref="favorites")
 
-    drink = db.Relationship("Drink", backref="favorites")
+    drink = db.relationship("Drink", backref="favorites")
 
 
 class Comment(db.Model):
@@ -177,3 +177,19 @@ class Comment(db.Model):
     comment = db.Column(db.String, nullable=False)
 
     user = db.relationship("User", backref="comments")
+
+
+class DrinkPost(db.Model):
+    """Model for tracking drinks added by users"""
+
+    __tablename__ = "drinkposts"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"))
+
+    drink_id = db.Column(db.Integer, db.ForeignKey("drinks.id", ondelete="CASCADE"))
+
+    user = db.relationship("User", backref="drinkposts")
+
+    drink = db.relationship("Drink", backref="author")

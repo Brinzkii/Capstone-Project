@@ -12,8 +12,15 @@ from models import (
     Category,
     Favorite,
     Comment,
+    DrinkPost,
 )
-from forms import SignupForm, LoginForm, SearchForm
+from forms import (
+    SignupForm,
+    LoginForm,
+    SearchForm,
+    DrinkForm,
+    IngredientsForm,
+)
 
 app = Flask(__name__)
 
@@ -177,6 +184,42 @@ def show_user_profile(user_id):
     return render_template("profile.html", user=user, favorites=favorites)
 
 
+@app.route("/favorite/add/<int:drink_id>")
+def add_favorite(drink_id):
+    """Add user favorite to database"""
+
+    if g.user:
+        f = Favorite(user_id=g.user.id, drink_id=drink_id)
+
+        db.session.add(f)
+        db.session.commit()
+
+        flash("Drink successfully added to favorites!", "success")
+        return redirect(f"/profile/{g.user.id}")
+    else:
+        flash("You must be logged in to add favorites!", "danger")
+        return redirect("/")
+
+
+@app.route("/favorite/delete/<int:drink_id>")
+def delete_favorite(drink_id):
+    """Delete user favorite from database"""
+
+    if g.user:
+        f = Favorite.query.filter(
+            Favorite.user_id == g.user.id, Favorite.drink_id == drink_id
+        ).first()
+
+        db.session.delete(f)
+        db.session.commit()
+
+        flash("Drink successfully deleted from favorites", "warning")
+        return redirect(f"/profile/{g.user.id}")
+    else:
+        flash("You must be logged in to add favorites!", "danger")
+        return redirect("/")
+
+
 #################################### Drink Routes ####################################
 
 
@@ -187,6 +230,83 @@ def show_drinks():
     drinks = Drink.query.order_by(Drink.name).all()
 
     return render_template("drinks.html", drinks=drinks, title="All Drinks")
+
+
+@app.route("/drinks/add", methods=["GET", "POST"])
+def add_drink():
+    """Add user drink to database"""
+
+    form = DrinkForm()
+
+    form.category_id.choices = [
+        (c.id, c.name) for c in Category.query.order_by(Category.name).all()
+    ]
+    form.category_id.choices.insert(0, (None, "Select the category"))
+    form.glass_id.choices = [
+        (g.id, g.name) for g in Glass.query.order_by(Glass.name).all()
+    ]
+    form.glass_id.choices.insert(0, (None, "Select the glass"))
+    # iform.ingredient.choices = [
+    #     (i.id, i.name) for i in Ingredient.query.order_by(Ingredient.name).all()
+    # ]
+    # iform.ingredient.choices.insert(0, (None, "Select ingredient"))
+
+    if form.validate_on_submit():
+        if form.category_id.data != None and form.glass_id.data != None:
+            # Create drink from form and add to db
+            d = Drink(
+                name=form.name.data,
+                category_id=form.category_id.data,
+                glass_id=form.glass_id.data,
+                instructions=form.instructions.data,
+                thumbnail=form.thumbnail.data,
+                main_img=form.main_img.data,
+                video=form.video.data,
+            )
+
+            db.session.add(d)
+
+            flash(
+                "Please enter the drink ingredients and their measurements to complete the process.",
+                "info",
+            )
+            return redirect("/ingredients/add")
+            # Create drink post tying drink to author and add to db
+            dp = DrinkPost(user_id=g.user.id, drink_id=d.id)
+
+            db.session.add(dp)
+            db.session.commit()
+
+            flash(
+                f"{{d.name}} has now been added, thanks for your contribution {g.user.username}!",
+                "success",
+            )
+            return redirect(f"/{d.id}")
+        else:
+            flash(
+                "A category and glass must be selected before adding a drink!",
+                "warning",
+            )
+            return redirect("/drinks/add")
+    else:
+        return render_template("add-drink.html", form=form)
+
+
+@app.route("/ingredients/add", methods=["GET", "POST"])
+def add_ingredients():
+    """Add ingredients and measurements to go with new drink (max 15 ingredient-measurement pairs)"""
+
+    form = IngredientsForm()
+    for field in form:
+        field.choices = [
+            (i.id, i.name) for i in Ingredient.query.order_by(Ingredient.name).all()
+        ]
+        field.choices[0] = (None, "Select an ingredient")
+
+    if form.validate_on_submit():
+        print("success")
+    else:
+        return render_template("add-ingredients.html", form=form)
 
 
 @app.route("/<int:drink_id>")
@@ -261,39 +381,3 @@ def get_search_results(q):
             results.append(drink)
 
     return results
-
-
-@app.route("/favorite/add/<int:drink_id>")
-def add_favorite(drink_id):
-    """Add user favorite to database"""
-
-    if g.user:
-        f = Favorite(user_id=g.user.id, drink_id=drink_id)
-
-        db.session.add(f)
-        db.session.commit()
-
-        flash("Drink successfully added to favorites!", "success")
-        return redirect(f"/profile/{g.user.id}")
-    else:
-        flash("You must be logged in to add favorites!", "danger")
-        return redirect("/")
-
-
-@app.route("/favorite/delete/<int:drink_id>")
-def delete_favorite(drink_id):
-    """Delete user favorite from database"""
-
-    if g.user:
-        f = Favorite.query.filter(
-            Favorite.user_id == g.user.id, Favorite.drink_id == drink_id
-        ).first()
-
-        db.session.delete(f)
-        db.session.commit()
-
-        flash("Drink successfully deleted from favorites", "warning")
-        return redirect(f"/profile/{g.user.id}")
-    else:
-        flash("You must be logged in to add favorites!", "danger")
-        return redirect("/")

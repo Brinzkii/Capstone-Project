@@ -3,11 +3,20 @@
     height: 50px;
 }
 
-i.bi {
+i.bi-heart {
     font-size: 1.75rem;
     color:red;
 }
 
+i.bi-plus-lg {
+    font-size: 1.75rem;
+    color: #abb6c2;
+}
+
 i:hover {
     cursor: pointer;
+}
+
+.title-und {
+    text-decoration: underline;
 }

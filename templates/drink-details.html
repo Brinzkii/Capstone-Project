@@ -1,22 +1,20 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="container">
-    <h2 class="text-center">{{drink.name}}</h2>
-
-    <img src="{{drink.main_img}}" alt="" class="text-center">
-    <h5>Category: {{drink.category.name}}</h5>
-    <h5>Glass: {{drink.glass.name}}</h5>
-    {% if drink.video %}
-    <h5><a href="{{drink.video}}">Video link</a></h5>
-    {% endif %}
-    <ul>
-        {% for ingredient in ingredients %}
-            {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
-            <li>{{i.name}} - {{ingredient.measurement}}</li>
-        {% endfor %}
-    </ul>
-    <p>Instructions: {{drink.instructions}}</p>
-
+<div class="card mx-auto" style="width: 85%">
+	<div class="card-body">
+		<h2 class="card-title text-center">{{drink.name}}</h2>
+		<h5 class="card-subtitle text-center mb-2">Category: {{drink.category.name}}</h5>
+		<h5 class="card-subtitle text-center mb-2">Glass: {{drink.glass.name}}</h5>
+		<img src="{{drink.main_img}}" class="card-img" alt="..." />
+		<ul class="list-group">
+			<h5 class="card-subtitle title-und mt-3">Ingredients:</h5>
+			{% for ingredient in ingredients %} {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
+			<li class="list-group-item mb-0">{{i.name}} - {{ingredient.measurement}}</li>
+			{% endfor %}
+		</ul>
+		<h5 class="card-subtitle title-und mt-1 mb-3">Instructions:</h5>
+		<p class="card-text">{{drink.instructions}}</p>
+	</div>
 </div>
 
 {% endblock %}
