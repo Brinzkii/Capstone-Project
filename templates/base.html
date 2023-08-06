@@ -1,91 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/superhero/bootstrap.min.css" integrity="sha384-HnTY+mLT0stQlOwD3wcAzSVAZbrBp141qwfR4WfTqVQKSgmcgzk+oP0ieIyrxiFO" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/style.css">
-    <title>{% block title %} {% endblock %}</title>
-</head>
-<body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/superhero/bootstrap.min.css"
+			integrity="sha384-HnTY+mLT0stQlOwD3wcAzSVAZbrBp141qwfR4WfTqVQKSgmcgzk+oP0ieIyrxiFO"
+			crossorigin="anonymous"
+		/>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+		<link rel="stylesheet" href="/static/style.css" />
+		<title>{% block title %} {% endblock %}</title>
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-lg navbar-dark bg-light sticky-top">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="/"><img src="/static/images/logo.png" alt="#" class="nav-img" /></a>
+				<button
+					class="navbar-toggler btn btn-secondary"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#navbar"
+					aria-controls="navbar"
+					aria-expanded="false"
+					aria-label="Toggle navigation"
+				>
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse pr-0" id="navbar">
+					<div class="container-fluid">
+						<ul class="navbar-nav nav me-auto justify-content-end">
+							{% if g.user %}
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-light sticky-top" >
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/"><img src="/static/images/logo.png" alt="#" class="nav-img"></a>
-          <button class="navbar-toggler btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbar">
-            <ul class="navbar-nav nav me-auto justify-content-end">
-              {% if g.user %}
+							<li class="nav-item">
+								<a class="nav-link text-dark" href="/profile">Profile </a>
+							</li>
 
-              <li class="nav-item">
-                <a class="nav-link text-dark" href="/profile">Profile
-                </a>
-              </li>
+							{% else %}
 
-              {% else %}
+							<li class="nav-item">
+								<a class="nav-link text-dark" href="/login">Login </a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" href="/signup">Signup</a>
+							</li>
 
-              <li class="nav-item">
-                <a class="nav-link text-dark" href="/login">Login
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-dark" href="/signup">Signup</a>
-              </li>
+							{% endif %}
+							<li class="nav-item">
+								<a class="nav-link text-dark" href="/drinks">Drinks</a>
+							</li>
+							<li class="nav-item dropdown">
+								<a
+									class="nav-link dropdown-toggle text-dark"
+									data-bs-toggle="dropdown"
+									href="#"
+									role="button"
+									aria-haspopup="true"
+									aria-expanded="false"
+									>Categories</a
+								>
+								<div class="dropdown-menu">
+									{% for category in categories %}
 
-              {% endif %}
-              <li class="nav-item">
-                <a class="nav-link text-dark" href="/drinks">Drinks</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Categories</a>
-                <div class="dropdown-menu">
-                  
-                  {% for category in categories %}
+									<a class="dropdown-item" href="/drinks/{{category.id}}">{{category.name}}</a>
 
-                  <a class="dropdown-item" href="/drinks/{{category.id}}">{{category.name}}</a>
+									{% endfor %}
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="container-fluid justify-content-end">
+						<form method="POST" id="search_form" action="/search" class="form-inline">
+							{{ search_form.hidden_tag() }} {% for field in search_form if field.widget.input_type !=
+							'hidden' %} {% for error in field.errors %}
+							<span class="text-danger">{{ error }}</span>
+							{% endfor %} {{ field(placeholder=field.label.text, class="form-control") }} {% endfor %}
 
-                  {% endfor %}
+							<button class="btn btn-secondary">Search</button>
+						</form>
 
-                </div>
-              </li>
-            </ul>
-    
-            <form method="POST" id="search_form" action="/search" class="form-inline">
-              {{ search_form.hidden_tag() }}
-    
-              {% for field in search_form if field.widget.input_type != 'hidden' %}
-              {% for error in field.errors %}
-                  <span class="text-danger">{{ error }}</span>
-              {% endfor %}
-                {{ field(placeholder=field.label.text, class="form-control") }}
-              {% endfor %}
-    
-              <button class="btn btn-secondary">Search</button>
-          </form>
+						{% if g.user %}
 
-            {% if g.user %}
+						<li>
+							<a href="/logout" class="btn btn-warning text-center">Logout</a>
+						</li>
 
-            <li>
-              <a href="/logout" class="btn btn-warning text-center">Logout</a>
-            </li>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</nav>
 
-            {% endif %}
-          </div>
-        </div>
-      </nav>
+		{% for category, message in get_flashed_messages(with_categories=True) %}
+		<div class="alert alert-{{ category }} text-center">{{ message }}</div>
+		{% endfor %} {% block content %} {% endblock %}
 
-      {% for category, message in get_flashed_messages(with_categories=True) %}
-        <div class="alert alert-{{ category }} text-center">{{ message }}</div>
-      {% endfor %}
-
-
-      {% block content %} {% endblock %}
-
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-
-</body>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+			crossorigin="anonymous"
+		></script>
+	</body>
 </html>
