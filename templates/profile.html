@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="text-center mt-2">
+	<h2>{{user.username}}'s Profile</h2>
+
+	<img src="{{user.profile_img}}" alt="#" />
+</div>
+
+<div class="mt-5 col-5 text-center">
+	<h4>Favorite Drinks</h4>
+	<ul id="fav-list" class="list-group">
+		{% for drink in favorites %}
+		<li class="list-group-item">
+			<h6>{{drink.name}}</h6>
+			{% if g.user.username == user.username %}
+			<a href="/favorite/delete/{{drink.id}}" class="btn btn-sm btn-danger text-center">Remove</a>
+			<br />
+			<br />
+			{% endif %}
+
+			<a href="/{{drink.id}}"><img src="{{drink.thumbnail}}" alt="" /></a>
+			<hr class="mb-0" />
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+
+{% endblock %}

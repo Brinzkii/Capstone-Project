@@ -27,7 +27,7 @@ app.config["SECRET_KEY"] = "password"
 
 connect_db(app)
 
-#################################### User Routes ####################################
+#################################### App Setup Routes ####################################
 
 
 @app.context_processor
@@ -46,6 +46,23 @@ def inject_search_form():
     return dict(search_form=search_form)
 
 
+@app.context_processor
+def inject_check_favorites():
+    """Make function for checking drink against favorites available globally"""
+
+    return dict(check_favorites=check_favorites)
+
+
+def check_favorites(drink, favorites):
+    """Checks a drink against list of favorite drinks"""
+
+    for fav in favorites:
+        if fav == drink:
+            return True
+
+    return False
+
+
 @app.before_request
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
@@ -55,6 +72,22 @@ def add_user_to_g():
 
     else:
         g.user = None
+
+
+@app.before_request
+def add_favorites_to_g():
+    """If global user exists add favorite drink objects to global"""
+    if g.user:
+        favorites = []
+        for favs in g.user.favorites:
+            fav_drink = Drink.query.get_or_404(favs.drink_id)
+            favorites.append(fav_drink)
+        g.favorites = favorites
+    else:
+        g.favorites = None
+
+
+#################################### User Routes ####################################
 
 
 def sess_login(user):
@@ -131,6 +164,19 @@ def logout_user():
     return redirect("/")
 
 
+@app.route("/profile/<int:user_id>")
+def show_user_profile(user_id):
+    """Show user information"""
+
+    user = User.query.get_or_404(user_id)
+    favorites = []
+    for favs in user.favorites:
+        fav_drink = Drink.query.get_or_404(favs.drink_id)
+        favorites.append(fav_drink)
+
+    return render_template("profile.html", user=user, favorites=favorites)
+
+
 #################################### Drink Routes ####################################
 
 
@@ -194,11 +240,7 @@ def get_search_results(q):
     results = []
 
     # First search for any matching ingredients
-    ingredients = Ingredient.query.filter(
-        db.or_(
-            Ingredient.name.ilike(f"%{q}%"),
-        )
-    ).all()
+    ingredients = Ingredient.query.filter(Ingredient.name.ilike(f"%{q}%")).all()
     # Then add each of the drinks containing that ingredient to results array
     if ingredients:
         for ingredient in ingredients:
@@ -206,24 +248,52 @@ def get_search_results(q):
                 results.append(drink.drink)
 
     # Search for any matching categories
-    categories = Category.query.filter(
-        db.or_(
-            Category.name.ilike(f"%{q}%"),
-        )
-    ).all()
+    categories = Category.query.filter(Category.name.ilike(f"%{q}%")).all()
     # Add drinnks in matching category to results
     if categories:
         for category in categories:
             results.append(category.drinks)
 
     # Search for any matching drinks and add to results
-    drinks = Drink.query.filter(
-        db.or_(
-            Drink.name.ilike(f"%{q}%"),
-        )
-    ).all()
+    drinks = Drink.query.filter(Drink.name.ilike(f"%{q}%")).all()
     if drinks:
         for drink in drinks:
             results.append(drink)
 
     return results
+
+
+@app.route("/favorite/add/<int:drink_id>")
+def add_favorite(drink_id):
+    """Add user favorite to database"""
+
+    if g.user:
+        f = Favorite(user_id=g.user.id, drink_id=drink_id)
+
+        db.session.add(f)
+        db.session.commit()
+
+        flash("Drink successfully added to favorites!", "success")
+        return redirect(f"/profile/{g.user.id}")
+    else:
+        flash("You must be logged in to add favorites!", "danger")
+        return redirect("/")
+
+
+@app.route("/favorite/delete/<int:drink_id>")
+def delete_favorite(drink_id):
+    """Delete user favorite from database"""
+
+    if g.user:
+        f = Favorite.query.filter(
+            Favorite.user_id == g.user.id, Favorite.drink_id == drink_id
+        ).first()
+
+        db.session.delete(f)
+        db.session.commit()
+
+        flash("Drink successfully deleted from favorites", "warning")
+        return redirect(f"/profile/{g.user.id}")
+    else:
+        flash("You must be logged in to add favorites!", "danger")
+        return redirect("/")

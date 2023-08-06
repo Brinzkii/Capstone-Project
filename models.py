@@ -160,6 +160,8 @@ class Favorite(db.Model):
 
     user = db.relationship("User", backref="favorites")
 
+    drink = db.Relationship("Drink", backref="favorites")
+
 
 class Comment(db.Model):
     """Model for tracking users favorite drinks"""
