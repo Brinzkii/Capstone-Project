@@ -1,10 +1,16 @@
 .nav-img {
     width: 175px;
     height: 50px;
+    border-radius: .08cm;
 }
 
 i.bi-heart {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    color: red;
+}
+
+i.bi-heart-fill {
+    font-size: 1.5rem;
     color: red;
 }
 

@@ -1,0 +1,20 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="row justify-content-md-center text-center mt-4">
+	<div class="col-md-9 col-lg-7">
+		<h2 class="mb-2">Edit {{drink.name}} Details</h2>
+		<form method="POST" id="add_drink_form">
+			<div class="col-12">
+				{{ form.hidden_tag() }} {% for field in form if field.widget.input_type != 'hidden' %} {% for error in
+				field.errors %}
+				<span class="text-danger">{{ error }}</span>
+				{% endfor %} {{ field(placeholder=field.label.text, class="form-control", rows='5') }} {% endfor %}
+			</div>
+
+			<a href="/profile/{{g.user.id}}" class="btn btn-warning mt-2">Cancel</a>
+			<button class="btn btn-success mt-2">Submit Changes</button>
+		</form>
+	</div>
+</div>
+
+{% endblock %}
