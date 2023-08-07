@@ -79,3 +79,9 @@ class IngredientsForm(FlaskForm):
     measurement14 = StringField("Measurement")
     ingredient15 = SelectField("Ingredient")
     measurement15 = StringField("Measurement")
+
+
+class CommentForm(FlaskForm):
+    """Form for adding comment to drink recipe"""
+
+    comment = TextAreaField("What would you like to say?", validators=[DataRequired()])

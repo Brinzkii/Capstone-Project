@@ -178,6 +178,8 @@ class Comment(db.Model):
 
     user = db.relationship("User", backref="comments")
 
+    drink = db.Relationship("Drink", backref="comments")
+
 
 class DrinkPost(db.Model):
     """Model for tracking drinks added by users"""

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect, session, g
+from better_profanity import profanity
 from sqlalchemy.exc import IntegrityError
 from models import (
     connect_db,
@@ -20,6 +21,7 @@ from forms import (
     SearchForm,
     DrinkForm,
     IngredientsForm,
+    CommentForm,
 )
 
 app = Flask(__name__)
@@ -205,8 +207,8 @@ def add_favorite(drink_id):
         flash("Drink successfully added to favorites!", "success")
         return redirect(f"/{drink_id}")
     else:
-        flash("You must be logged in to add favorites!", "danger")
-        return redirect("/")
+        flash("You must be logged in to add favorites!", "warning")
+        return redirect("/login")
 
 
 @app.route("/favorite/delete/<int:drink_id>")
@@ -221,11 +223,53 @@ def delete_favorite(drink_id):
         db.session.delete(f)
         db.session.commit()
 
-        flash("Drink successfully deleted from favorites", "warning")
+        flash("Drink successfully deleted from favorites", "success")
         return redirect(f"/profile/{g.user.id}")
     else:
-        flash("You must be logged in to add favorites!", "danger")
-        return redirect("/")
+        flash("You must be logged in to add favorites!", "warning")
+        return redirect("/login")
+
+
+@app.route("/<int:drink_id>/comment/add", methods=["GET", "POST"])
+def add_comment(drink_id):
+    """If loggged in add user comment and censor profanity"""
+
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        if g.user:
+            censored = profanity.censor(form.comment.data)
+            c = Comment(user_id=g.user.id, drink_id=drink_id, comment=censored)
+
+            db.session.add(c)
+            db.session.commit()
+
+            flash(f"Your comment was added, {g.user.username}!", "success")
+            return redirect(f"/{drink_id}")
+        else:
+            flash("You must be logged in to leave comments!", "warning")
+            return redirect("/login")
+    else:
+        return render_template("add-comment.html", form=form)
+
+
+@app.route("/<int:comment_id>/delete")
+def delete_comment(comment_id):
+    """If logged in delete comment"""
+
+    c = Comment.query.get_or_404(comment_id)
+
+    if g.user.id == c.user_id:
+        db.session.delete(c)
+        db.session.commit()
+
+        flash("Your comment has now been deleted!", "success")
+        return redirect(f"/{c.drink_id}")
+    else:
+        flash(
+            "You must be logged in and the author of a comment to delete it!", "warning"
+        )
+        return redirect("/login")
 
 
 #################################### Drink Routes ####################################
@@ -404,6 +448,7 @@ def show_drink_details(drink_id):
         "drink-details.html",
         drink=drink,
         ingredients=ingredients,
+        User=User,
         Ingredient=Ingredient,
         DrinkPost=DrinkPost,
     )

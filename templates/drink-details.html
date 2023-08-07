@@ -31,4 +31,27 @@
 	</div>
 </div>
 
+<div class="card mx-auto mt-4" style="width: 85%">
+	<div class="card-body pt-2">
+		<h4 class="card-title text-center">Comments</h4>
+		{% if g.user %}
+		<h6 class="text-center mb-3"><a href="/{{drink.id}}/comment/add" class="btn btn-sm btn-success">Add</a></h6>
+		{% endif %}
+		<ul class="list-group">
+			{% for comment in drink.comments %} {% set u = User.query.get_or_404(comment.user_id) %}
+			<li class="list-group-item list-group-item-light mb-0 pr-0">
+				{% if g.user.id == u.id %}
+				<div class="container row justify-content-end">
+					<a href="/{{comment.id}}/delete"><i class="bi bi-trash" style="position: absolute"></i></a>
+				</div>
+				{% endif %}
+				<p class="card-text mr-5">{{comment.comment}}</p>
+				<small><a href="/profile/{{u.id}}">- {{u.username}}</a></small>
+			</li>
+			<hr />
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+
 {% endblock %}

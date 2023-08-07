@@ -35,6 +35,14 @@ i.bi-dash-circle:hover {
     color: red;
 }
 
+i.bi-trash {
+    color: #2b3e50
+}
+
+i.bi-x-lg {
+    position: fixed;
+}
+
 .title-und {
     text-decoration: underline;
 }
