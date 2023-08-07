@@ -366,10 +366,31 @@ def edit_drink(drink_id):
             flash("Your changes have been saved!", "success")
             return redirect(f"/{drink.id}")
         else:
-            flash("Sorry only the author of this drink post can make edits!", "danger")
+            flash("Sorry, only the author of this drink post can make edits!", "danger")
             return redirect(f"/")
     else:
         return render_template("/edit-drink.html", form=form, drink=drink)
+
+
+@app.route("/<int:drink_id>/delete")
+def delete_drink(drink_id):
+    """If author is g.user delete drink and redirect to profile"""
+
+    drink = Drink.query.get_or_404(drink_id)
+    post = DrinkPost.query.filter(
+        DrinkPost.drink_id == drink_id, DrinkPost.user_id == g.user.id
+    ).first()
+
+    if post:
+        db.session.delete(drink)
+        db.session.delete(post)
+        db.session.commit()
+
+        flash(f"{drink.name} has now been deleted!", "warning")
+        return redirect(f"/profile/{g.user.id}")
+    else:
+        flash("Sorry, only the author of this drink post can delete it!", "danger")
+        return redirect(f"/")
 
 
 @app.route("/<int:drink_id>")
