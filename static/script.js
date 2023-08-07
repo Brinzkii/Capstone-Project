@@ -15,14 +15,9 @@ function add_ingredient_fields() {
 	bottom.next().show();
 	bottom.next().next().show();
 
-	del_btn.insertAfter(bottom);
+	del_btn.insertBefore(bottom.next());
 
 	hide_if_no_more();
-}
-
-function remove_ingredient_fields(btn) {
-	btn.next().hide();
-	btn.next().next().hide();
 }
 
 function hide_if_no_more() {
@@ -33,7 +28,17 @@ function hide_if_no_more() {
 
 $('.bi-plus-lg').on('click', add_ingredient_fields);
 
-$('.bi-dash-circle').on('click', function (e) {
-	remove_ingredient_fields(e.target);
-	console.log('clicked');
+function remove_ingredient_fields(btn) {
+	let next = $(btn.next());
+	
+	next.hide();
+	next.next().val('');
+	next.next().hide();
+	btn.remove();
+}
+
+$('#add_ingredients_form').on('click', '.bi-dash-circle', function(evt) {
+	let btn = $(evt.target);
+	
+	remove_ingredient_fields(btn);
 });

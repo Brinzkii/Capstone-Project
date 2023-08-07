@@ -5,7 +5,7 @@
 
 i.bi-heart {
     font-size: 1.75rem;
-    color:red;
+    color: red;
 }
 
 i.bi-plus-lg {
@@ -13,8 +13,20 @@ i.bi-plus-lg {
     color: #abb6c2;
 }
 
+i.bi-plus-lg:hover {
+    color: #5cb85c;
+}
+
 i:hover {
     cursor: pointer;
+}
+
+i.bi-dash-circle {
+    font-size: 1.35rem;
+}
+
+i.bi-dash-circle:hover {
+    color: red;
 }
 
 .title-und {

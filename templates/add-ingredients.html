@@ -1,14 +1,14 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="row justify-content-md-center text-center mt-4">
-	<div class="col-md-9 col-lg-7">
-		<h2 class="mb-2">Add Drink Ingredients and Measurements</h2>
-		<form method="POST" id="add_ingredients_form">
+	<div class="col-md-7 col-lg-5">
+		<h2 class="mb-2">Add {{drink.name}} Ingredients and Measurements</h2>
+		<form method="POST" id="ingredients_form">
 			{{ form.hidden_tag() }} {% for field in form if field.widget.input_type != 'hidden' %} {% for error in
 			field.errors %}
 			<span class="text-danger">{{ error }}</span>
 			{% endfor %} {{ field(placeholder=field.label.text, class="form-control mb-1 ing-form") }} {% endfor %}
-			<a href="#"><i class="bi bi-plus-lg"></i></a>
+			<li></li> <a href="#"><i class="bi bi-plus-lg"></i></a>
 			<br />
 			<button class="btn btn-success mt-2">Finish Drink</button>
 		</form>

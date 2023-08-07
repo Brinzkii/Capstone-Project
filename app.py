@@ -246,10 +246,6 @@ def add_drink():
         (g.id, g.name) for g in Glass.query.order_by(Glass.name).all()
     ]
     form.glass_id.choices.insert(0, (None, "Select the glass"))
-    # iform.ingredient.choices = [
-    #     (i.id, i.name) for i in Ingredient.query.order_by(Ingredient.name).all()
-    # ]
-    # iform.ingredient.choices.insert(0, (None, "Select ingredient"))
 
     if form.validate_on_submit():
         if form.category_id.data != None and form.glass_id.data != None:
@@ -265,23 +261,18 @@ def add_drink():
             )
 
             db.session.add(d)
+            db.session.commit()
 
-            flash(
-                "Please enter the drink ingredients and their measurements to complete the process.",
-                "info",
-            )
-            return redirect("/ingredients/add")
-            # Create drink post tying drink to author and add to db
             dp = DrinkPost(user_id=g.user.id, drink_id=d.id)
 
             db.session.add(dp)
             db.session.commit()
 
             flash(
-                f"{{d.name}} has now been added, thanks for your contribution {g.user.username}!",
-                "success",
+                "Please enter the drink ingredients and their measurements to complete the process.",
+                "info",
             )
-            return redirect(f"/{d.id}")
+            return redirect(f"/{d.id}/ingredients/add")
         else:
             flash(
                 "A category and glass must be selected before adding a drink!",
@@ -292,9 +283,10 @@ def add_drink():
         return render_template("add-drink.html", form=form)
 
 
-@app.route("/ingredients/add", methods=["GET", "POST"])
-def add_ingredients():
+@app.route("/<int:drink_id>/ingredients/add", methods=["GET", "POST"])
+def add_ingredients(drink_id):
     """Add ingredients and measurements to go with new drink (max 15 ingredient-measurement pairs)"""
+    d = Drink.query.get_or_404(drink_id)
 
     form = IngredientsForm()
     for field in form:
@@ -304,9 +296,32 @@ def add_ingredients():
         field.choices[0] = (None, "Select an ingredient")
 
     if form.validate_on_submit():
-        print("success")
+        for field in form:
+            print(field.data)
+            if field.data == None:
+                flash(
+                f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
+                "success"
+                )
+                return redirect(f"/{d.id}")
+                        
+            elif 'ingredient' in field.id and field.data:
+                d_i = DrinkIngredients(drink_id=d.id, ingredient_id=field.data)
+
+            elif 'measurement' in field.id and field.data:
+                if d_i:
+                    d_i.measurement=field.data
+                    db.session.add(d_i)
+                    db.session.commit()
+                    d_i = None
+            
+        flash(
+            f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
+            "success"
+        )
+        return redirect(f"/{d.id}")
     else:
-        return render_template("add-ingredients.html", form=form)
+        return render_template("add-ingredients.html", form=form, drink=d)
 
 
 @app.route("/<int:drink_id>")
@@ -372,12 +387,15 @@ def get_search_results(q):
     # Add drinnks in matching category to results
     if categories:
         for category in categories:
-            results.append(category.drinks)
+            for drink in category.drinks: 
+                if drink not in results:
+                    results.append(category.drinks)
 
     # Search for any matching drinks and add to results
     drinks = Drink.query.filter(Drink.name.ilike(f"%{q}%")).all()
     if drinks:
         for drink in drinks:
-            results.append(drink)
+            if drink not in results:
+                results.append(drink)
 
     return results
