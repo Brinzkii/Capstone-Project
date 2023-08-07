@@ -32,3 +32,16 @@ i.bi-dash-circle:hover {
 .title-und {
     text-decoration: underline;
 }
+
+button.btn {
+    border-radius: .08cm;
+}
+
+a.btn {
+    border-radius: .08cm;
+}
+
+img.thumb {
+    width: 200px;
+    height: 200px;
+}

@@ -177,11 +177,19 @@ def show_user_profile(user_id):
 
     user = User.query.get_or_404(user_id)
     favorites = []
+    drinkposts = []
+
     for favs in user.favorites:
         fav_drink = Drink.query.get_or_404(favs.drink_id)
         favorites.append(fav_drink)
 
-    return render_template("profile.html", user=user, favorites=favorites)
+    for posts in user.drinkposts:
+        drink = Drink.query.get_or_404(posts.drink_id)
+        drinkposts.append(drink)
+
+    return render_template(
+        "profile.html", user=user, favorites=favorites, posts=drinkposts
+    )
 
 
 @app.route("/favorite/add/<int:drink_id>")
@@ -300,24 +308,24 @@ def add_ingredients(drink_id):
             print(field.data)
             if field.data == None:
                 flash(
-                f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
-                "success"
+                    f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
+                    "success",
                 )
                 return redirect(f"/{d.id}")
-                        
-            elif 'ingredient' in field.id and field.data:
+
+            elif "ingredient" in field.id and field.data:
                 d_i = DrinkIngredients(drink_id=d.id, ingredient_id=field.data)
 
-            elif 'measurement' in field.id and field.data:
+            elif "measurement" in field.id and field.data:
                 if d_i:
-                    d_i.measurement=field.data
+                    d_i.measurement = field.data
                     db.session.add(d_i)
                     db.session.commit()
                     d_i = None
-            
+
         flash(
             f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
-            "success"
+            "success",
         )
         return redirect(f"/{d.id}")
     else:
@@ -336,6 +344,7 @@ def show_drink_details(drink_id):
         drink=drink,
         ingredients=ingredients,
         Ingredient=Ingredient,
+        DrinkPost=DrinkPost,
     )
 
 
@@ -387,7 +396,7 @@ def get_search_results(q):
     # Add drinnks in matching category to results
     if categories:
         for category in categories:
-            for drink in category.drinks: 
+            for drink in category.drinks:
                 if drink not in results:
                     results.append(category.drinks)
 

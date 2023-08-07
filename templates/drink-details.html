@@ -3,6 +3,12 @@
 <div class="card mx-auto" style="width: 85%">
 	<div class="card-body">
 		<h2 class="card-title text-center">{{drink.name}}</h2>
+		{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post =
+		DrinkPost.query.filter_by(drink_id=drink.id).first() %}
+		<h5 class="card-subtitle text-center mb-2">
+			Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
+		</h5>
+		{% endif %}
 		<h5 class="card-subtitle text-center mb-2">Category: {{drink.category.name}}</h5>
 		<h5 class="card-subtitle text-center mb-2">Glass: {{drink.glass.name}}</h5>
 		<img src="{{drink.main_img}}" class="card-img" alt="..." />
