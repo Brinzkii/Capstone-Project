@@ -1,1 +1,31 @@
-https://www.thecocktaildb.com/api.php
+# <Underground Mixology>
+
+## Description
+
+Cocktail recipe database driven website using https://www.thecocktaildb.com/api.php. Built using Flask, SQLAlchemy, Jinja, JQuery and WTForms
+
+## Installation
+
+-   Create app directory and virtual environment, activating source
+
+-   Clone repo https://github.com/Brinzkii/Capstone-Project.git
+
+-   Install req's with 'pip install -r requirements.txt'
+
+-   Start databases with 'sudo service postgresql start'
+
+-   Create database 'capstone'
+
+## Seeding
+
+Seeding the database takes awhile due to the number of requests necessary and the delay needed between each to get successful responses. Be prepared to wait 40ish minutes - you will get status updates via the console throughout the process
+
+-   Run ipython
+
+-   %run seed.py
+
+## Usage
+
+-   Start flask with 'flask run'
+
+-   Enter localhost:5000/ in browser
