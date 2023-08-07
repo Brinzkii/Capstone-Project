@@ -1,13 +1,28 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} {% block content %} {% if g.user %}
 
-{% if g.user %}
-
-<h2 class="text-center mt-4">Drink of the Day</h2>
+<div class="container-fluid">
+	<div class="card text-center text-dark bg-light mt-4 mb-3 mx-auto">
+		<div class="card-header"><h1>Drink of the Day!</h1></div>
+		<div class="card-body">
+			<h3 class="card-title mb-1">{{drink.name}}</h3>
+			<h6 class="card-subtitle mb-3">Category: {{drink.category.name}}</h6>
+			<div class="row container-fluid justify-content-center text-center">
+				<h6 class="card-subtitle mb-1 col-3">Likes: {{len(drink.favorites)}}</h6>
+				<h6 class="card-subtitle mb-1 col-3">Comments: {{len(drink.comments)}}</h6>
+			</div>
+			<a href="/{{drink.id}}"><img src="{{drink.main_img}}" class="card-img-bottom" alt="#" /></a>
+		</div>
+	</div>
+</div>
 
 {% else %}
 
-<h2 class="text-center mt-4">Welcome to Underground Mixology!</h2>
+<div class="container-fluid text-center">
+	<h2 class="mt-4">Welcome to Underground Mixology!</h2>
+	<p>
+		If you are new please consider signing up or you can choose to browse drinks with access to limited features. If
+		you have an existing account welcome back!
+	</p>
+</div>
 
-{% endif %}
-
-{% endblock %}
+{% endif %} {% endblock %}

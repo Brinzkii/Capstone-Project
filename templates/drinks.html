@@ -11,14 +11,24 @@
 	{% for drink in drinks %}
 
 	<div class="card bg-light text-dark text-center col-5 mt-4 ml-1 mr-1">
+		{% if g.user %} {% if check_favorites(drink, g.favorites) %}
+		<div class="row container justify-content-start pl-1 mb-1">
+			<a href="/favorite/delete/{{drink.id}}"><i class="bi bi-heart-fill" style="position: absolute"></i></a>
+		</div>
+		{% else %}
+		<div class="row container justify-content-start pl-1 mb-1">
+			<a href="/favorite/add/{{drink.id}}"><i class="bi bi-heart" style="position: absolute"></i></a>
+		</div>
+		{% endif %} {% endif %}
 		<div class="card-body pl-0 pr-0">
-			<h5 class="card-title">{{drink.name}}</h5>
+			<h4 class="card-title mb-1">{{drink.name}}</h4>
 			<h6 class="card-subtitle mb-1"><small>({{drink.category.name}})</small></h6>
-			{% if g.user %} {% if check_favorites(drink, g.favorites) %}
-			<a href="/favorite/delete/{{drink.id}}"><i class="bi bi-heart-fill"></i></a>
-			{% else %}
-			<a href="/favorite/add/{{drink.id}}"><i class="bi bi-heart"></i></a>
-			{% endif %} {% endif %}
+			{% if g.user %}
+			<div class="row container-fluid justify-content-between text-center m-0 p-0">
+				<h6 class="card-subtitle mb-1 col-6"><small>Likes: {{len(drink.favorites)}}</small></h6>
+				<h6 class="card-subtitle mb-1 col-6"><small>Comments: {{len(drink.comments)}}</small></h6>
+			</div>
+			{% endif %}
 		</div>
 		<img src="{{drink.main_img}}" class="card-img-bottom" alt="#" />
 		<a href="/{{drink.id}}" class="btn btn-info mt-2 mb-2">Details</a>

@@ -1,25 +1,32 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="card mx-auto" style="width: 85%">
+	{% if g.user %} {% if check_favorites(drink, g.favorites) %}
+	<div class="row container justify-content-start pl-4 mb-1">
+		<a href="/favorite/delete/{{drink.id}}"><i class="bi bi-heart-fill" style="position: absolute"></i></a>
+	</div>
+	{% else %}
+	<div class="row container justify-content-start pl-4 mb-1">
+		<a href="/favorite/add/{{drink.id}}"><i class="bi bi-heart" style="position: absolute"></i></a>
+	</div>
+	{% endif %} {% endif %}
 	<div class="card-body">
-		<h2 class="card-title text-center">{{drink.name}}</h2>
-		{% if g.user %} {% if check_favorites(drink, g.favorites) %}
-		<h5 class="text-center">
-			<a href="/favorite/delete/{{drink.id}}"><i class="bi bi-heart-fill"></i></a>
-		</h5>
-		{% else %}
-		<h5 class="text-center">
-			<a href="/favorite/add/{{drink.id}}"><i class="bi bi-heart"></i></a>
-		</h5>
-		{% endif %} {% endif %} {% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post =
+		<h2 class="card-title text-center mb-0">{{drink.name}}</h2>
+		{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post =
 		DrinkPost.query.filter_by(drink_id=drink.id).first() %}
 		<h5 class="card-subtitle text-center mb-2">
 			Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
 		</h5>
 		{% endif %}
-		<h5 class="card-subtitle text-center mb-2">Category: {{drink.category.name}}</h5>
-		<h5 class="card-subtitle text-center mb-2">Glass: {{drink.glass.name}}</h5>
+		<h5 class="card-subtitle mb-2 text-center">({{drink.category.name}})</h5>
+		{% if g.user %}
+		<div class="row container-fluid justify-content-center m-0 p-0 text-center">
+			<h6 class="card-subtitle mb-1 col-3">Likes: {{len(drink.favorites)}}</h6>
+			<h6 class="card-subtitle mb-1 col-3">Comments: {{len(drink.comments)}}</h6>
+		</div>
+		{% endif %}
 		<img src="{{drink.main_img}}" class="card-img" alt="..." />
+		<h5 class="card-subtitle mt-3 mb-0">Glass: {{drink.glass.name}}</h5>
 		<ul class="list-group">
 			<h5 class="card-subtitle title-und mt-3">Ingredients:</h5>
 			{% for ingredient in ingredients %} {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
@@ -27,7 +34,7 @@
 			{% endfor %}
 		</ul>
 		<h5 class="card-subtitle title-und mt-1 mb-3">Instructions:</h5>
-		<p class="card-text">{{drink.instructions}}</p>
+		<p class="card-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{drink.instructions}}</p>
 	</div>
 </div>
 
@@ -36,7 +43,7 @@
 		<h4 class="card-title text-center">Comments</h4>
 		{% if g.user %}
 		<h6 class="text-center mb-3"><a href="/{{drink.id}}/comment/add" class="btn btn-sm btn-success">Add</a></h6>
-		{% endif %}
+		{% endif %} {% if drink.comments %}
 		<ul class="list-group">
 			{% for comment in drink.comments %} {% set u = User.query.get_or_404(comment.user_id) %}
 			<li class="list-group-item list-group-item-light mb-0 pr-0">
@@ -49,7 +56,9 @@
 				<small><a href="/profile/{{u.id}}">- {{u.username}}</a></small>
 			</li>
 			<hr />
-			{% endfor %}
+			{% endfor %} {% else %}
+			<p class="card-text text-center">No comments have been added yet, you should be the first!</p>
+			{% endif %}
 		</ul>
 	</div>
 </div>

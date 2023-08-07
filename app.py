@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, flash, redirect, session, g
 from better_profanity import profanity
 from sqlalchemy.exc import IntegrityError
+import random
+import time
+import schedule
 from models import (
     connect_db,
     db,
@@ -35,6 +38,7 @@ app.config["SQLALCHEMY_ECHO"] = False
 app.config["SECRET_KEY"] = "password"
 
 connect_db(app)
+
 
 #################################### App Setup Routes ####################################
 
@@ -78,7 +82,6 @@ def add_user_to_g():
 
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
-
     else:
         g.user = None
 
@@ -112,11 +115,25 @@ def sess_logout():
         del session[CURR_USER_KEY]
 
 
+def get_random_drink():
+    """Every 24hrs pick a new drink from database and add to global"""
+    print("getting drink of the day")
+
+    drinks = Drink.query.all()
+    idx = random.randint(0, len(drinks) - 1)
+
+    return drinks[idx]
+
+
 @app.route("/")
 def show_home():
-    """Show homepage"""
+    """Show homepage - if logged in showcase daily random drink"""
 
-    return render_template("home.html")
+    if g.user:
+        drink = get_random_drink()
+        return render_template("home.html", drink=drink, len=len)
+    else:
+        return render_template("home.html")
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -281,7 +298,7 @@ def show_drinks():
 
     drinks = Drink.query.order_by(Drink.name).all()
 
-    return render_template("drinks.html", drinks=drinks, title="All Drinks")
+    return render_template("drinks.html", drinks=drinks, title="All Drinks", len=len)
 
 
 @app.route("/drinks/add", methods=["GET", "POST"])
@@ -451,6 +468,7 @@ def show_drink_details(drink_id):
         User=User,
         Ingredient=Ingredient,
         DrinkPost=DrinkPost,
+        len=len,
     )
 
 
@@ -499,7 +517,7 @@ def get_search_results(q):
 
     # Search for any matching categories
     categories = Category.query.filter(Category.name.ilike(f"%{q}%")).all()
-    # Add drinnks in matching category to results
+    # Add drinks in matching category to results
     if categories:
         for category in categories:
             for drink in category.drinks:
