@@ -1,8 +1,7 @@
-
 import os
 from models import db
 from unittest import TestCase
-from flask import Flask, g
+from flask import g
 from models import db, User, Drink, Category, Glass, Favorite, Comment
 
 os.environ["DATABASE_URL"] = "postgresql:///capstone-test"
@@ -26,7 +25,6 @@ class TestUserViews(TestCase):
         with app.app_context():
             self.client = app.test_client()
 
-            db.session.expire_on_commit = False
             db.drop_all()
             db.create_all()
 
@@ -226,7 +224,7 @@ class TestUserViews(TestCase):
             self.assertIn("Remove", html)
 
 
-    def test_add_favorite(self):
+    def test_add_favorite_user(self):
         """Test route for adding favorites while logged in"""
 
         with self.client as c:
@@ -248,7 +246,7 @@ class TestUserViews(TestCase):
         
 
 
-    def test_add_favorite_bad(self):
+    def test_add_favorite(self):
         """Test route for adding favorite if no logged in user"""
         
         with app.app_context():
@@ -262,7 +260,7 @@ class TestUserViews(TestCase):
         self.assertIn('must be logged in to add', html)
 
 
-    def test_delete_favorite(self):
+    def test_delete_favorite_user(self):
         """Test route for deleting favorite while logged in"""
 
         with self.client as c:
@@ -284,7 +282,7 @@ class TestUserViews(TestCase):
             self.assertIn('deleted from favorites', html)
 
 
-    def test_delete_favorite_bad(self):
+    def test_delete_favorite(self):
         """Test route for deleting favorite while not logged in"""
 
         with app.app_context():
@@ -303,7 +301,7 @@ class TestUserViews(TestCase):
         self.assertIn('must be logged in to delete', html)
 
 
-    def test_add_comment(self):
+    def test_add_comment_user(self):
         """Test route for adding comment while logged in"""
 
         with self.client as c:
@@ -331,7 +329,7 @@ class TestUserViews(TestCase):
             self.assertIn(drink.name, html)
 
 
-    def test_add_comment_bad(self):
+    def test_add_comment(self):
         """Test route for adding comment while not logged in"""
 
         with app.app_context():
@@ -345,7 +343,7 @@ class TestUserViews(TestCase):
         self.assertIn('must be logged in to leave comments', html)
 
 
-    def test_delete_comment(self):
+    def test_delete_comment_user(self):
         """Test route for deletingcomment while logged in"""
 
         with self.client as c:
@@ -370,7 +368,7 @@ class TestUserViews(TestCase):
             self.assertIn(drink.name, html)
 
 
-    def test_delete_comment_bad(self):
+    def test_delete_comment(self):
         """Test route for deleting comment while not logged in"""
 
         with app.app_context():
