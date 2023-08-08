@@ -37,7 +37,7 @@ function remove_ingredient_fields(btn) {
 	btn.remove();
 }
 
-$('#add_ingredients_form').on('click', '.bi-dash-circle', function(evt) {
+$('#ingredients_form').on('click', '.bi-dash-circle', function(evt) {
 	let btn = $(evt.target);
 	
 	remove_ingredient_fields(btn);

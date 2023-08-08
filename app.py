@@ -319,37 +319,41 @@ def add_drink():
     form.glass_id.choices.insert(0, (None, "Select the glass"))
 
     if form.validate_on_submit():
-        if form.category_id.data != None and form.glass_id.data != None:
-            # Create drink from form and add to db
-            d = Drink(
-                name=form.name.data,
-                category_id=form.category_id.data,
-                glass_id=form.glass_id.data,
-                instructions=form.instructions.data,
-                thumbnail=form.thumbnail.data,
-                main_img=form.main_img.data,
-                video=form.video.data,
-            )
+        if g.user:
+            if form.category_id.data != None and form.glass_id.data != None:
+                # Create drink from form and add to db
+                d = Drink(
+                    name=form.name.data,
+                    category_id=form.category_id.data,
+                    glass_id=form.glass_id.data,
+                    instructions=form.instructions.data,
+                    thumbnail=form.thumbnail.data,
+                    main_img=form.main_img.data,
+                    video=form.video.data,
+                )
 
-            db.session.add(d)
-            db.session.commit()
+                db.session.add(d)
+                db.session.commit()
 
-            dp = DrinkPost(user_id=g.user.id, drink_id=d.id)
+                dp = DrinkPost(user_id=g.user.id, drink_id=d.id)
 
-            db.session.add(dp)
-            db.session.commit()
+                db.session.add(dp)
+                db.session.commit()
 
-            flash(
-                "Please enter the drink ingredients and their measurements to complete the process.",
-                "info",
-            )
-            return redirect(f"/{d.id}/ingredients/add")
+                flash(
+                    "Please enter the drink ingredients and their measurements to complete the process.",
+                    "info",
+                )
+                return redirect(f"/{d.id}/ingredients/add")
+            else:
+                flash(
+                    "A category and glass must be selected before adding a drink!",
+                    "warning",
+                )
+                return redirect("/drinks/add")
         else:
-            flash(
-                "A category and glass must be selected before adding a drink!",
-                "warning",
-            )
-            return redirect("/drinks/add")
+            flash('You must be logged in to add a drink!', 'warning')
+            return redirect('/login')
     else:
         return render_template("add-drink.html", form=form)
 
@@ -358,6 +362,7 @@ def add_drink():
 def add_ingredients(drink_id):
     """Add ingredients and measurements to go with new drink (max 15 ingredient-measurement pairs)"""
     d = Drink.query.get_or_404(drink_id)
+    
 
     form = IngredientsForm()
     for field in form:
@@ -367,29 +372,39 @@ def add_ingredients(drink_id):
         field.choices[0] = (None, "Select an ingredient")
 
     if form.validate_on_submit():
-        for field in form:
-            if field.data == None:
+        print(form.data)
+        if g.user:
+            d_p = DrinkPost.query.filter('drink_id'== d.id, 'user_id'==g.user.id).first()
+            if d_p:
+                for field in form:
+                    if field.data == None:
+                        flash(
+                            f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
+                            "success",
+                        )
+                        return redirect(f"/{d.id}")
+
+                    elif "ingredient" in field.id and field.data:
+                        d_i = DrinkIngredients(drink_id=d.id, ingredient_id=field.data)
+
+                    elif "measurement" in field.id and field.data:
+                        if d_i:
+                            d_i.measurement = field.data
+                            db.session.add(d_i)
+                            db.session.commit()
+                            d_i = None
+
                 flash(
                     f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
                     "success",
                 )
                 return redirect(f"/{d.id}")
-
-            elif "ingredient" in field.id and field.data:
-                d_i = DrinkIngredients(drink_id=d.id, ingredient_id=field.data)
-
-            elif "measurement" in field.id and field.data:
-                if d_i:
-                    d_i.measurement = field.data
-                    db.session.add(d_i)
-                    db.session.commit()
-                    d_i = None
-
-        flash(
-            f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
-            "success",
-        )
-        return redirect(f"/{d.id}")
+            else:
+                flash('You must be the author of the drink to edit ingredients!', 'warning')
+                return redirect('/')
+        else:
+            flash('You must be logged in to access this feature!', 'warning')
+            return redirect('/')
     else:
         return render_template("add-ingredients.html", form=form, drink=d)
 
