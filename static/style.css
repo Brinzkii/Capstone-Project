@@ -59,3 +59,8 @@ img.thumb {
     width: 200px;
     height: 200px;
 }
+
+div.alert {
+    width: 75%;
+    border-radius: .08cm;
+}

@@ -99,11 +99,10 @@
 		</nav>
 
 		{% for category, message in get_flashed_messages(with_categories=True) %}
-		<div class="alert alert-dismissable alert-{{ category }} text-center mb-0 pb-1 pt-1 pl-0 pr-0">
-			<div class="container row justify-content-start" style="position: fixed">
+		<div class="alert alert-dismissable alert-{{ category }} mx-auto text-center mb-0 mt-2 pb-1 pt-0 pl-0 pr-0">
+			<div class="row container justify-content-start pl-3 pt-0 mb-1">
 				<button type="button" class="btn btn-close" data-bs-theme="dark" data-bs-dismiss="alert">
-					<i class="bi bi-x-lg"></i>
-				</button>
+					<i class="bi bi-x-lg" style="position: absolute;"></i>
 			</div>
 			<h3 class="alert-heading">{{category.capitalize()}}</h3>
 			<p class="mb-0">{{message}}</p>

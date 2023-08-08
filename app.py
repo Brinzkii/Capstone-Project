@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect, session, g
 from better_profanity import profanity
 from sqlalchemy.exc import IntegrityError
+import os
 import random
 import time
 import schedule
@@ -31,8 +32,9 @@ app = Flask(__name__)
 
 CURR_USER_KEY = ""
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///capstone"
-
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL", "postgresql:///capstone"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SECRET_KEY"] = "password"
@@ -154,6 +156,7 @@ def signup_user():
             flash(f"Welcome to the club, {user.username}!", "success")
             return redirect("/")
         except IntegrityError:
+            db.session.rollback()
             flash("Sorry, that username is already taken!", "danger")
             return render_template("signup.html", form=form)
     else:
@@ -508,7 +511,8 @@ def get_search_results(q):
     results = []
 
     # First search for any matching ingredients
-    ingredients = Ingredient.query.filter(Ingredient.name.ilike(f"%{q}%")).all()
+    ingredients = Ingredient.query.filter(
+        Ingredient.name.ilike(f"%{q}%")).all()
     # Then add each of the drinks containing that ingredient to results array
     if ingredients:
         for ingredient in ingredients:
