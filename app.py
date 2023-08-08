@@ -119,7 +119,6 @@ def sess_logout():
 
 def get_random_drink():
     """Every 24hrs pick a new drink from database and add to global"""
-    print("getting drink of the day")
 
     drinks = Drink.query.all()
     idx = random.randint(0, len(drinks) - 1)
@@ -214,7 +213,7 @@ def show_user_profile(user_id):
     )
 
 
-@app.route("/favorite/add/<int:drink_id>")
+@app.route("/<int:drink_id>/favorite/add")
 def add_favorite(drink_id):
     """Add user favorite to database"""
 
@@ -231,7 +230,7 @@ def add_favorite(drink_id):
         return redirect("/login")
 
 
-@app.route("/favorite/delete/<int:drink_id>")
+@app.route("/<int:drink_id>/favorite/delete")
 def delete_favorite(drink_id):
     """Delete user favorite from database"""
 
@@ -246,7 +245,7 @@ def delete_favorite(drink_id):
         flash("Drink successfully deleted from favorites", "success")
         return redirect(f"/profile/{g.user.id}")
     else:
-        flash("You must be logged in to add favorites!", "warning")
+        flash("You must be logged in to delete favorites!", "warning")
         return redirect("/login")
 
 
@@ -279,7 +278,7 @@ def delete_comment(comment_id):
 
     c = Comment.query.get_or_404(comment_id)
 
-    if g.user.id == c.user_id:
+    if g.user and g.user.id == c.user_id:
         db.session.delete(c)
         db.session.commit()
 
@@ -369,7 +368,6 @@ def add_ingredients(drink_id):
 
     if form.validate_on_submit():
         for field in form:
-            print(field.data)
             if field.data == None:
                 flash(
                     f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
