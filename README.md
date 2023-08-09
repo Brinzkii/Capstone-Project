@@ -24,6 +24,10 @@ Seeding the database takes awhile due to the number of requests necessary and th
 
 -   %run seed.py
 
+## Testing
+
+-  Can be run with python -m unittest
+
 ## Usage
 
 -   Start flask with 'flask run'
