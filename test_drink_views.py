@@ -2,7 +2,7 @@ import os
 from models import db
 from unittest import TestCase
 from flask import g
-from models import db, User, Drink, Category, Glass, Favorite, Comment, Ingredient
+from models import db, User, Drink, Category, Glass, Favorite, Comment, Ingredient, DrinkPost
 
 os.environ["DATABASE_URL"] = "postgresql:///capstone-test"
 
@@ -54,6 +54,8 @@ class TestDrinkViews(TestCase):
             db.session.add(d2)
             db.session.add(d3)
             db.session.commit()
+
+            self.user = User.query.filter_by(username='test-user')
 
     def tearDown(self):
         """Remove session and drop all tables"""
@@ -121,7 +123,7 @@ class TestDrinkViews(TestCase):
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Warning', html)
+        self.assertIn('warning', html)
         self.assertIn('must be logged in to add a drink', html)
 
 
@@ -140,7 +142,7 @@ class TestDrinkViews(TestCase):
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Info', html)
+        self.assertIn('info', html)
         self.assertIn('enter the drink ingredients and their measurements', html)  
         self.assertIn('Add test-name Ingredients and Measurements', html)  
 
@@ -150,21 +152,171 @@ class TestDrinkViews(TestCase):
         """Test view for adding ingredients for user drink"""
 
         with app.app_context():
+            i = Ingredient(name='another-test-ingredient')
+            db.session.add(i)
+            db.session.commit()
             drink = Drink.query.first()
-            ingredient = Ingredient.query.first()
+            ingredients = Ingredient.query.all()
 
         resp = self.client.get(f'/{drink.id}/ingredients/add')
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
         self.assertIn('<select', html)  
-        self.assertIn(f'Add {drink.name} Ingredients and Measurements', html) 
+        self.assertIn(f'Add {drink.name} Ingredients and Measurements', html)
+
 
         resp = self.client.post(f'/{drink.id}/ingredients/add', data={
-            'ingredient1': ingredient.id, 'measurement1': 1, 'ingredient2': ingredient.id, 'measurement2': 1
+            'ingredient1': ingredients[0].id, 'measurement1': 1, 'ingredient2': ingredients[1].id, 'measurement2': 1
                                                                       }, follow_redirects=True)
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Danger', html)  
-        self.assertIn('must be logged in to access', html) 
+        self.assertIn('danger', html)  
+
+
+    def test_ingredients_add_view_user(self):
+        """Test view for adding ingredients for user drink"""
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                with app.app_context():
+                    user = User.query.filter_by(username='test-user').first()
+                    sess[CURR_USER_KEY] = user.id
+                    drink = Drink.query.filter_by(name='drink1').first()
+
+                    d_p = DrinkPost(drink_id=drink.id, user_id=sess[CURR_USER_KEY])
+                    i = Ingredient(name='another-test-ingredient')
+
+                    db.session.add(d_p)
+                    db.session.add(i)
+                    db.session.commit()
+
+                    drink = Drink.query.filter_by(name='drink1').first()
+                    ingredients = Ingredient.query.all()
+
+            resp = c.post(f'/{drink.id}/ingredients/add', data={
+                'ingredient1': ingredients[0].id, 'measurement1': 1, 'ingredient2': ingredients[1].id, 'measurement2': 1
+                                                                      }, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('success', html)
+
+
+    def test_drink_edit_view(self):
+        """Test view for editing a drink while not logged in"""
+
+        with app.app_context():
+            drink = Drink.query.first()
+            category = Category.query.first()
+            glass = Glass.query.first()
+
+        resp = self.client.get(f'/{drink.id}/edit')
+        html = resp.get_data(as_text=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Edit', html)
+        self.assertIn(drink.name, html)
+        self.assertIn('<select', html)
+
+        resp = self.client.post(f'/{drink.id}/edit', data={
+            'name': 'test-edit-drink',
+            'category_id': category.id,
+            'glass_id': glass.id,
+            'thumbnail': 'img',
+            'main_img': 'img'
+        } , follow_redirects=True)
+        html = resp.get_data(as_text=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('warning', html)
+        self.assertIn('must be logged in', html)
+
+
+    def test_drink_edit_view_user(self):
+        """Test view for editing a drink while logged in"""
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                with app.app_context():
+                    drink = Drink.query.filter_by(name='drink1').first()
+                    user = User.query.filter_by(username='test-user').first()
+                    sess[CURR_USER_KEY] = user.id
+
+                    d_p = DrinkPost(drink_id=drink.id, user_id=user.id)
+
+                    db.session.add(d_p)
+                    db.session.commit()
+
+                    drink = Drink.query.filter_by(name='drink1').first()
+                    category = Category.query.first()
+                    glass = Glass.query.first()
+
+            resp = c.post(f'/{drink.id}/edit', data={
+            'name': 'test-edit-drink',
+            'category_id': category.id,
+            'glass_id': glass.id,
+            'thumbnail': 'img',
+            'main_img': 'img'
+            } , follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('success', html)
+            self.assertIn('changes have been saved', html)
+
+
+    def test_drink_delete_view(self):
+        """Test view for deleting user drink while not logged in"""
+
+        with app.app_context():
+            drink = Drink.query.first()
+
+        resp = self.client.get(f'/delete/{drink.id}', follow_redirects=True)
+        html = resp.get_data(as_text=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('warning', html)
+        self.assertIn('must be logged in', html)
+
+
+    def test_drink_delete_view_user(self):
+        """Test view for deleting a user drink while logged in"""
+
+        # Test if not author of post
+        with self.client as c:
+            with c.session_transaction() as sess:
+                with app.app_context():
+                    drink = Drink.query.filter_by(name='drink1').first()
+                    user = User.query.filter_by(username='test-user').first()
+                    sess[CURR_USER_KEY] = user.id
+
+            resp = c.get(f'/delete/{drink.id}', follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('warning', html)
+            self.assertIn('only the author', html)
+
+        # Test if author of post
+        with self.client as c:
+            with c.session_transaction() as sess:
+                with app.app_context():
+                    drink = Drink.query.filter_by(name='drink1').first()
+                    user = User.query.filter_by(username='test-user').first()
+                    sess[CURR_USER_KEY] = user.id
+
+                    d_p = DrinkPost(drink_id=drink.id, user_id=user.id)
+
+                    db.session.add(d_p)
+                    db.session.commit()
+
+                    drink = Drink.query.filter_by(name='drink1').first()
+
+            resp = c.get(f'/delete/{drink.id}', follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('warning', html)
+            self.assertIn('has now been deleted', html)
