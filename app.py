@@ -439,7 +439,7 @@ def add_ingredients(drink_id):
                 )
                 return redirect(f"/{d.id}")
             else:
-                flash('You must be the author of the drink to edit ingredients!', 'warning')
+                flash('You must be the author of the drink to edit ingredients!', 'danger')
                 return redirect('/')
         else:
             flash('You must be logged in to access this feature!', 'warning')
@@ -524,14 +524,18 @@ def show_search_results():
     form = SearchForm()
 
     if form.validate_on_submit():
-        q = form.search.data
-        results = get_search_results(q)
+        if g.user:
+            q = form.search.data
+            results = get_search_results(q)
 
-        return render_template(
-            "drinks.html",
-            drinks=results,
-            title=f"{len(results)} Search Results for '{q}'",
-        )
+            return render_template(
+                "drinks.html",
+                drinks=results,
+                title=f"{len(results)} Search Results for '{q}'",
+            )
+        else:
+            flash('You must be logged in to access this feature!', 'warning')
+        return redirect('/')
     else:
         flash("Something went wrong, please try again!", "warning")
         return redirect("/")
@@ -558,7 +562,7 @@ def get_search_results(q):
         for category in categories:
             for drink in category.drinks:
                 if drink not in results:
-                    results.append(category.drinks)
+                    results.append(drink)
 
     # Search for any matching drinks and add to results
     drinks = Drink.query.filter(Drink.name.ilike(f"%{q}%")).all()
