@@ -18,15 +18,17 @@ Cocktail recipe database driven website using https://www.thecocktaildb.com/api.
 
 ## Seeding
 
-Seeding the database takes awhile due to the number of requests necessary and the delay needed between each to get successful responses. Be prepared to wait 40ish minutes - you will get status updates via the console throughout the process
+Seeding the database takes awhile due to the number of requests necessary and the delay needed between each to get successful responses. Be prepared to wait 30 minutes - you will get status updates via the console throughout the process
 
 -   Run ipython
 
--   %run seed.py
+-   '%run seed.py'
 
 ## Testing
 
--  Can be run with python -m unittest
+-  All tests can be run with 'python -m unittest'
+
+- Specific test files can be run with 'python -m unittest <file name.py>'
 
 ## Usage
 
