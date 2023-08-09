@@ -33,7 +33,7 @@
 			<img src="{{drink.main_img}}" class="card-img-bottom" alt="#" />
 			{% if g.user and check_favorites(drink, g.favorites) %}
 			<div class="row container justify-content-around mx-auto p-0">
-				<a href="/{{drink.id}}/favorite/delete" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-5 dislike"><i class="bi bi-heart"></i></a>
+				<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-5 dislike"><i class="bi bi-heart"></i></a>
 				<a href="/{{drink.id}}" class="btn btn-info mt-2 mb-2 ml-2 col-5 align-self-center">Details</a>
 			</div>
 			{% elif g.user %}

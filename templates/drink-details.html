@@ -23,11 +23,11 @@
 		{% endif %}
 		{% if g.user and check_favorites(drink, g.favorites) %}
 			<div class="row container justify-content-center mx-auto mb-1 p-0">
-				<a href="/{{drink.id}}/favorite/delete" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 col-2 dislike"><i class="bi bi-heart"></i></a>
+				<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-center pb-0 pt-0 mt-2 mb-2 col-2 dislike"><i class="bi bi-heart"></i></a>
 			</div>
 			{% elif g.user %}
 			<div class="row container justify-content-center mx-auto mb-1 p-0">
-				<a href="/{{drink.id}}/favorite/add" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 col-2 like"><i class="bi bi-heart"></i></a>
+				<a href="/{{drink.id}}/favorite/add" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-2 like"><i class="bi bi-heart"></i></a>
 			</div>
 		{% endif %}
 		{% if g.user %}
