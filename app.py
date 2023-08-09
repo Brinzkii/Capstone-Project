@@ -553,22 +553,26 @@ def get_search_results(q):
     if ingredients:
         for ingredient in ingredients:
             for drink in ingredient.drinks:
-                results.append(drink.drink)
+                if drink.drink != None:
+                    results.append(drink.drink)
 
+    print(results)
     # Search for any matching categories
     categories = Category.query.filter(Category.name.ilike(f"%{q}%")).all()
     # Add drinks in matching category to results
     if categories:
         for category in categories:
             for drink in category.drinks:
-                if drink not in results:
+                if drink != None and drink not in results:
                     results.append(drink)
 
+    print(results)
     # Search for any matching drinks and add to results
     drinks = Drink.query.filter(Drink.name.ilike(f"%{q}%")).all()
     if drinks:
         for drink in drinks:
-            if drink not in results:
+            if drink != None and drink not in results:
                 results.append(drink)
 
+    print(results)
     return results
