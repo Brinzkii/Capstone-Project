@@ -1,6 +1,7 @@
 from app import app
 from models import Drink, Ingredient, Glass, Category, DrinkIngredients, db
 from time import sleep
+from alive_progress import alive_bar
 import random
 import requests
 
@@ -19,13 +20,15 @@ def add_categories():
     resp = requests.get(base_url + "list.php", params={"c": "list"})
     categories = resp.json()
 
-    for category in categories["drinks"]:
-        c = Category(name=category["strCategory"].title())
+    with alive_bar(len(categories['drinks']), title='Adding categories:', length=25) as bar:
+        for category in categories["drinks"]:
+            c = Category(name=category["strCategory"].title())
 
-        with app.app_context():
-            db.session.add(c)
-            db.session.commit()
-
+            with app.app_context():
+                db.session.add(c)
+                db.session.commit()
+                bar()
+                
 
 def add_glasses():
     """Get all glass types"""
@@ -33,12 +36,14 @@ def add_glasses():
     resp = requests.get(base_url + "list.php", params={"g": "list"})
     glasses = resp.json()
 
-    for glass in glasses["drinks"]:
-        g = Glass(name=glass["strGlass"].title())
+    with alive_bar(len(glasses['drinks']), title='Adding glasses:', length=25) as bar:
+        for glass in glasses["drinks"]:
+            g = Glass(name=glass["strGlass"].title())
 
-        with app.app_context():
-            db.session.add(g)
-            db.session.commit()
+            with app.app_context():
+                db.session.add(g)
+                db.session.commit()
+                bar()
 
 
 def add_ingredients():
@@ -53,20 +58,22 @@ def add_ingredients():
         ingredients.append(ingredient["strIngredient1"])
 
     # Now query each for details and add to DB
-    for ingredient in ingredients:
-        resp = requests.get(base_url + "search.php", params={"i": f"{ingredient}"})
-        ings = resp.json()
+    with alive_bar(len(ingredients), title='Adding ingredients:', length=25) as bar:
+        for ingredient in ingredients:
+            resp = requests.get(base_url + "search.php", params={"i": f"{ingredient}"})
+            ings = resp.json()
 
-        i = Ingredient(
-            name=ings["ingredients"][0]["strIngredient"].title(),
-            description=ings["ingredients"][0]["strDescription"],
-            abv=ings["ingredients"][0]["strABV"],
-            img=f"https://www.thecocktaildb.com/images/ingredients/{ings['ingredients'][0]['strIngredient']}.png",
-        )
+            i = Ingredient(
+                name=ings["ingredients"][0]["strIngredient"].title(),
+                description=ings["ingredients"][0]["strDescription"],
+                abv=ings["ingredients"][0]["strABV"],
+                img=f"https://www.thecocktaildb.com/images/ingredients/{ings['ingredients'][0]['strIngredient']}.png",
+            )
 
-        with app.app_context():
-            db.session.add(i)
-            db.session.commit()
+            with app.app_context():
+                db.session.add(i)
+                db.session.commit()
+                bar()
 
 
 def add_all_drinks():
@@ -77,28 +84,32 @@ def add_all_drinks():
         all_drinks = []
 
         # Get a list of all drinks in a category
-        for category in categories:
-            resp = requests.get(
-                base_url + "filter.php", params={"c": f"{category.name}"}
-            )
-            drinks = resp.json()
+        with alive_bar(len(categories), length=25) as bar:
+            for category in categories:
+                bar.title = f'Adding {category.name} drinks:'
+                resp = requests.get(
+                    base_url + "filter.php", params={"c": f"{category.name}"}
+                )
+                drinks = resp.json()
 
             # Get the details of each drink in the list we just received
-            count = 0
-            while count <= len(drinks["drinks"]) - 1:
-                # Create drink object
-                d = Drink(
-                    name=drinks["drinks"][count]["strDrink"],
-                    api_id=drinks["drinks"][count]["idDrink"],
-                    category_id=category.id,
-                    thumbnail=f"{drinks['drinks'][count]['strDrinkThumb']}/preview",
-                    main_img=drinks["drinks"][count]["strDrinkThumb"],
-                )
+                count = 0
+                while count <= len(drinks["drinks"]) - 1:
+                    # Create drink object
+                    d = Drink(
+                        name=drinks["drinks"][count]["strDrink"],
+                        api_id=drinks["drinks"][count]["idDrink"],
+                        category_id=category.id,
+                        thumbnail=f"{drinks['drinks'][count]['strDrinkThumb']}/preview",
+                        main_img=drinks["drinks"][count]["strDrinkThumb"],
+                    )
 
-                count += 1
+                    count += 1
 
-                db.session.add(d)
-                db.session.commit()
+                    db.session.add(d)
+                    db.session.commit()
+
+                bar()
 
 
 def add_drink_ingredients(category_id):
@@ -114,125 +125,128 @@ def add_drink_ingredients(category_id):
         progress = 0
 
         # Get detailed info for each drink in database via API and update missing info
-        for drink in drinks:
-            try:
-                resp = requests.get(
-                    base_url + "lookup.php", params={"i": f"{drink.api_id}"}
-                )
-            except:
-                print("API is mad - waiting 5 seconds")
-                sleep(5)
+        with alive_bar(len(drinks), length=20, title_length=20) as bar:
+            for drink in drinks:
+                bar.title = f'Adding {drink.name}:'
+                try:
+                    resp = requests.get(
+                        base_url + "lookup.php", params={"i": f"{drink.api_id}"}
+                    )
+                except:
+                    print("API is mad - waiting 5 seconds")
+                    sleep(5)
 
-                resp = requests.get(
-                    base_url + "lookup.php", params={"i": f"{drink.api_id}"}
-                )
+                    resp = requests.get(
+                        base_url + "lookup.php", params={"i": f"{drink.api_id}"}
+                    )
 
-            # Add delay to prevent API from locking up
-            sleep(random.uniform(2.00, 4.50))
+                # Add delay to prevent API from locking up
+                sleep(random.uniform(2.00, 4.50))
 
-            details = resp.json()
-            data = details["drinks"][0]
-            glass = Glass.query.filter_by(name=data["strGlass"].title()).first()
+                details = resp.json()
+                data = details["drinks"][0]
+                glass = Glass.query.filter_by(name=data["strGlass"].title()).first()
 
-            drink.video = data["strVideo"]
-            drink.glass_id = glass.id
-            drink.instructions = data["strInstructions"]
+                drink.video = data["strVideo"]
+                drink.glass_id = glass.id
+                drink.instructions = data["strInstructions"]
 
-            progress += 1
-            print(
-                f"""
- #################  {drink.category.name} ({drink.category.id}/{len(Category.query.all())})  #################
-                    
-                      Progress: {progress}/{len(drinks)}
--------------------------------------------------------------
-                """
-            )
+                # Loop through ingredients and create pairs in DB, adding ingredients if they are missing
+                count = 1
+                while data[f"strIngredient{count}"] != None:
+                    ingredient = Ingredient.query.filter_by(
+                        name=data[f"strIngredient{count}"].title()
+                    ).first()
 
-            # Loop through ingredients and create pairs in DB, adding ingredients if they are missing
-            count = 1
-            while data[f"strIngredient{count}"] != None:
-                ingredient = Ingredient.query.filter_by(
-                    name=data[f"strIngredient{count}"].title()
-                ).first()
+                    if ingredient == None:
+                        i = Ingredient(name=data[f"strIngredient{count}"].title())
 
-                if ingredient == None:
-                    i = Ingredient(name=data[f"strIngredient{count}"].title())
+                        db.session.add(i)
+                        db.session.commit()
 
-                    db.session.add(i)
+                        d_i = DrinkIngredients(
+                            drink_id=drink.id,
+                            ingredient_id=i.id,
+                            measurement=data[f"strMeasure{count}"],
+                        )
+
+                        db.session.add(d_i)
+                    else:
+                        d_i = DrinkIngredients(
+                            drink_id=drink.id,
+                            ingredient_id=ingredient.id,
+                            measurement=data[f"strMeasure{count}"],
+                        )
+
+                        db.session.add(d_i)
+
                     db.session.commit()
 
-                    d_i = DrinkIngredients(
-                        drink_id=drink.id,
-                        ingredient_id=i.id,
-                        measurement=data[f"strMeasure{count}"],
-                    )
-
-                    db.session.add(d_i)
-                else:
-                    d_i = DrinkIngredients(
-                        drink_id=drink.id,
-                        ingredient_id=ingredient.id,
-                        measurement=data[f"strMeasure{count}"],
-                    )
-
-                    db.session.add(d_i)
-
-                db.session.commit()
-
-                count += 1
+                    count += 1
+                bar()
 
 
 add_categories()
 
 print(
     """
-*****************************************************************
 
-Categories successfully stored - glasses will begin in 30 seconds
+*********************************************************************************
 
-*****************************************************************
+Categories successfully stored - glasses will begin in 5 seconds
+
+*********************************************************************************
+
       """
 )
-sleep(30)
+sleep(5)
 
 add_glasses()
 
 print(
     """
-*****************************************************************
 
-Glasses successfully stored - ingredients will begin in 30 seconds
+*********************************************************************************
 
-*****************************************************************
+Glasses successfully stored - ingredients will begin in 5 seconds
+
+*********************************************************************************
+
       """
 )
-sleep(30)
+sleep(5)
 
 add_ingredients()
 
 print(
     """
-*****************************************************************
 
-Ingredients successfully stored - drinks will begin in 30 seconds
+*********************************************************************************
 
-*****************************************************************
+Ingredients successfully stored - drinks will begin in 5 seconds
+
+*********************************************************************************
+
       """
 )
-sleep(30)
+sleep(5)
 
 add_all_drinks()
 
 print(
     """
-*****************************************************************
 
-Drinks successfully stored - the first category of drink details and ingredients will begin in 30 seconds
+*********************************************************************************
 
-*****************************************************************
+Drinks successfully stored - the first category of drink details and ingredients will begin in 10 seconds
+
+                                  ETA ~ 30 mins                                  
+
+*********************************************************************************
+
     """
 )
-sleep(30)
+sleep(10)
 
 with app.app_context():
     categories = Category.query.all()
@@ -246,22 +260,28 @@ with app.app_context():
             count += 1
 
             print(
-                """
-*****************************************************************
+                f"""
 
-The next category will begin in 60 seconds
+*********************************************************************************
+
+{count - 1} / {len(categories)} categories complete
+
+The next category will begin in 10 seconds
                 
-*****************************************************************              
+*********************************************************************************
+
 """
             )
-            sleep(60)
+            sleep(10)
 
 print(
     """
-*****************************************************************
+
+*********************************************************************************
 
 Database successfully seeded!
 
-*****************************************************************
+*********************************************************************************
+
       """
 )
