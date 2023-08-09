@@ -160,7 +160,7 @@ class TestUserViews(TestCase):
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("Success", html)
+        self.assertIn("success", html)
         self.assertIn("Welcome back, test-user", html)
         self.assertIn("Logout", html)
 
@@ -238,7 +238,7 @@ class TestUserViews(TestCase):
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn("Success", html)
+            self.assertIn("success", html)
             self.assertIn("added to favorites", html)
             self.assertIn("test-drink", html)
 
@@ -256,7 +256,7 @@ class TestUserViews(TestCase):
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Warning', html)
+        self.assertIn('warning', html)
         self.assertIn('must be logged in to add', html)
 
 
@@ -278,7 +278,7 @@ class TestUserViews(TestCase):
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('Success', html)
+            self.assertIn('success', html)
             self.assertIn('deleted from favorites', html)
 
 
@@ -297,7 +297,7 @@ class TestUserViews(TestCase):
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Warning', html)
+        self.assertIn('warning', html)
         self.assertIn('must be logged in to delete', html)
 
 
@@ -324,7 +324,7 @@ class TestUserViews(TestCase):
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('Success', html)
+            self.assertIn('success', html)
             self.assertIn('comment was added', html)
             self.assertIn(drink.name, html)
 
@@ -339,7 +339,7 @@ class TestUserViews(TestCase):
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Warning', html)
+        self.assertIn('warning', html)
         self.assertIn('must be logged in to leave comments', html)
 
 
@@ -363,7 +363,7 @@ class TestUserViews(TestCase):
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('Success', html)
+            self.assertIn('success', html)
             self.assertIn('comment has now been deleted', html)
             self.assertIn(drink.name, html)
 
@@ -383,5 +383,5 @@ class TestUserViews(TestCase):
         html = resp.get_data(as_text=True)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Warning', html)
+        self.assertIn('warning', html)
         self.assertIn('must be logged in and the author of a comment to delete', html)
