@@ -55,8 +55,6 @@ class TestDrinkViews(TestCase):
             db.session.add(d3)
             db.session.commit()
 
-            self.user = User.query.filter_by(username='test-user')
-
     def tearDown(self):
         """Remove session and drop all tables"""
 
