@@ -66,7 +66,7 @@
 							</li>
 						</ul>
 					</div>
-					<div class="container-fluid justify-content-end flex-nowrap">
+					<div class="container-fluid justify-content-end flex-nowrap pr-0">
 						{% if g.user %}
 						<form method="POST" id="search_form" action="/search" class="form-inline flex-shrink-1">
 							{{ search_form.hidden_tag() }} {% for field in search_form if field.widget.input_type !=
@@ -77,19 +77,13 @@
 							<button class="btn btn-secondary ml-1">Search</button>
 						</form>
 
-						<li>
-							<a href="/logout" class="btn btn-warning text-center">Logout</a>
-						</li>
+							<a href="/logout" class="btn btn-warning text-center ml-3 mr-0">Logout</a>
 
 						{% else %}
 
-						<li>
-							<a href="/login" class="btn btn-success text-center">Login</a>
-						</li>
+							<a href="/login" class="btn btn-success text-center mr-1">Login</a>
 
-						<li>
-							<a href="/signup" class="btn btn-info text-center">Signup</a>
-						</li>
+							<a href="/signup" class="btn btn-info text-center ml-1">Signup</a>
 
 						{% endif %}
 					</div>
