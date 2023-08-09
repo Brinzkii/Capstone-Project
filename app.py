@@ -54,6 +54,13 @@ def inject_categories():
 
 
 @app.context_processor
+def inject_drink_post():
+    """Make posts available in base template for use globally"""
+
+    return dict(DrinkPost=DrinkPost)
+
+
+@app.context_processor
 def inject_search_form():
     """Make search form available in base template for use in header"""
 
@@ -486,21 +493,25 @@ def edit_drink(drink_id):
 def delete_drink(drink_id):
     """If author is g.user delete drink and redirect to profile"""
 
-    drink = Drink.query.get_or_404(drink_id)
-    post = DrinkPost.query.filter(
-        DrinkPost.drink_id == drink_id, DrinkPost.user_id == g.user.id
-    ).first()
+    if g.user:
+        drink = Drink.query.get_or_404(drink_id)
+        post = DrinkPost.query.filter(
+            DrinkPost.drink_id == drink_id, DrinkPost.user_id == g.user.id
+        ).first()
 
-    if post:
-        db.session.delete(drink)
-        db.session.delete(post)
-        db.session.commit()
+        if post:
+            db.session.delete(drink)
+            db.session.delete(post)
+            db.session.commit()
 
-        flash(f"{drink.name} has now been deleted!", "warning")
-        return redirect(f"/profile/{g.user.id}")
+            flash(f"{drink.name} has now been deleted!", "warning")
+            return redirect(f"/profile/{g.user.id}")
+        else:
+            flash("Sorry, only the author of this drink post can delete it!", "danger")
+            return redirect(f"/")
     else:
-        flash("Sorry, only the author of this drink post can delete it!", "danger")
-        return redirect(f"/")
+        flash("You shouldn't be doing that ;)", 'danger')
+        return redirect('/')
 
 
 @app.route("/search", methods=["POST"])

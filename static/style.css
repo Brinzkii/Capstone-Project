@@ -6,12 +6,16 @@
 
 i.bi-heart {
     font-size: 1.5rem;
-    color: red;
 }
 
-i.bi-heart-fill {
-    font-size: 1.5rem;
-    color: red;
+a.btn-outline-light {
+    transition: all, ease-in-out, .4s;
+}
+
+a.btn-outline-light:hover {
+    background-color: #d9534f;
+    border-color: #d9534f;
+    transition: all, ease-in-out, .4s;
 }
 
 i.bi-plus-lg {
@@ -32,7 +36,7 @@ i.bi-dash-circle {
 }
 
 i.bi-dash-circle:hover {
-    color: red;
+    color: #d9534f;
 }
 
 i.bi-trash {
