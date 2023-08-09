@@ -67,6 +67,7 @@
 						</ul>
 					</div>
 					<div class="container-fluid justify-content-end flex-nowrap">
+						{% if g.user %}
 						<form method="POST" id="search_form" action="/search" class="form-inline flex-shrink-1">
 							{{ search_form.hidden_tag() }} {% for field in search_form if field.widget.input_type !=
 							'hidden' %} {% for error in field.errors %}
@@ -75,8 +76,6 @@
 
 							<button class="btn btn-secondary ml-1">Search</button>
 						</form>
-
-						{% if g.user %}
 
 						<li>
 							<a href="/logout" class="btn btn-warning text-center">Logout</a>
@@ -100,12 +99,12 @@
 
 		{% for category, message in get_flashed_messages(with_categories=True) %}
 		<div class="alert alert-dismissable alert-{{ category }} mx-auto text-center mb-0 mt-2 pb-1 pt-0 pl-0 pr-0">
-			<div class="row container justify-content-start pl-3 pt-0 mb-1">
+			<div class="row container justify-content-start pl-0 pt-0 mb-1 mx-auto">
 				<button type="button" class="btn btn-close" data-bs-theme="dark" data-bs-dismiss="alert">
 					<i class="bi bi-x-lg" style="position: absolute;"></i>
 			</div>
-			<h3 class="alert-heading">{{category.capitalize()}}</h3>
-			<p class="mb-0">{{message}}</p>
+			<h5 class="alert-heading mt-0 pb-1 pl-2 pr-2">{{message}}</h3>
+			<!-- <p class="mb-0">{{message}}</p> -->
 		</div>
 		{% endfor %} {% block content %} {% endblock %}
 

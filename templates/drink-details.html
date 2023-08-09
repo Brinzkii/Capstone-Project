@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="card mx-auto" style="width: 85%">
+<div class="card mx-auto mt-2" style="width: 85%">
 	{% if g.user %} {% if check_favorites(drink, g.favorites) %}
 	<div class="row container justify-content-start pl-4 mb-1">
 		<a href="/{{drink.id}}/favorite/delete"><i class="bi bi-heart-fill" style="position: absolute"></i></a>
