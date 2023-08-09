@@ -147,7 +147,6 @@ class TestDrinkViews(TestCase):
         self.assertIn('Add test-name Ingredients and Measurements', html)  
 
 
-################################ WIP ###################################
     def test_ingredients_add_view(self):
         """Test view for adding ingredients for user drink"""
 
@@ -320,3 +319,51 @@ class TestDrinkViews(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn('warning', html)
             self.assertIn('has now been deleted', html)
+
+
+    def test_search_view(self):
+        """Test view for searching database while not logged in"""
+
+        resp = self.client.post('/search', data={'search': 'drink'}, follow_redirects=True)
+        html = resp.get_data(as_text=True)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('warning', html)
+        self.assertIn('must be logged in', html)
+
+
+    def test_search_view_user(self):
+        """Test view for searching database while logged in"""
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                with app.app_context():
+                    user = User.query.filter_by(username='test-user').first()
+                    sess[CURR_USER_KEY] = user.id
+                    drinks = Drink.query.all()
+
+            resp = c.post('/search', data={'search': 'dr'}, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('Search Results', html)
+            self.assertIn(drinks[0].name, html)
+            self.assertIn(drinks[1].name, html)
+            self.assertIn(drinks[2].name, html)
+
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                with app.app_context():
+                    user = User.query.filter_by(username='test-user').first()
+                    sess[CURR_USER_KEY] = user.id
+                    drinks = Drink.query.all()
+                    
+            resp = c.post('/search', data={'search': 'test-cat'}, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('Search Results', html)
+            self.assertIn(drinks[0].name, html)
+            self.assertIn(drinks[1].name, html)
+            self.assertIn(drinks[2].name, html)
