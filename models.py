@@ -134,7 +134,7 @@ class DrinkIngredients(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    drink_id = db.Column(db.Integer, db.ForeignKey("drinks.id", ondelete="CASCADE"))
+    drink_id = db.Column(db.Integer, db.ForeignKey("drinks.id"))
 
     ingredient_id = db.Column(
         db.Integer, db.ForeignKey("ingredients.id", ondelete="CASCADE")

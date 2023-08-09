@@ -67,6 +67,12 @@ def inject_check_favorites():
 
     return dict(check_favorites=check_favorites)
 
+@app.context_processor
+def inject_len():
+    """Make length function available globally"""
+
+    return dict(len=len)
+
 
 def check_favorites(drink, favorites):
     """Checks a drink against list of favorite drinks"""
@@ -132,7 +138,7 @@ def show_home():
 
     if g.user:
         drink = get_random_drink()
-        return render_template("home.html", drink=drink, len=len)
+        return render_template("home.html", drink=drink)
     else:
         return render_template("home.html")
 
@@ -300,7 +306,34 @@ def show_drinks():
 
     drinks = Drink.query.order_by(Drink.name).all()
 
-    return render_template("drinks.html", drinks=drinks, title="All Drinks", len=len)
+    return render_template("drinks.html", drinks=drinks, title="All Drinks")
+
+
+@app.route("/<int:drink_id>")
+def show_drink_details(drink_id):
+    """Show details for a specific drink"""
+
+    drink = Drink.query.get_or_404(drink_id)
+    ingredients = drink.ingredients
+
+    return render_template(
+        "drink-details.html",
+        drink=drink,
+        ingredients=ingredients,
+        User=User,
+        Ingredient=Ingredient,
+        DrinkPost=DrinkPost
+    )
+
+
+@app.route("/drinks/<int:category_id>")
+def show_category_drinks(category_id):
+    """Show all drinks in a category"""
+
+    category = Category.query.get_or_404(category_id)
+    drinks = category.drinks
+
+    return render_template("drinks.html", drinks=drinks, title=f"{category.name}")
 
 
 @app.route("/drinks/add", methods=["GET", "POST"])
@@ -374,7 +407,7 @@ def add_ingredients(drink_id):
     if form.validate_on_submit():
         print(form.data)
         if g.user:
-            d_p = DrinkPost.query.filter('drink_id'== d.id, 'user_id'==g.user.id).first()
+            d_p = DrinkPost.query.filter(DrinkPost.drink_id == d.id, DrinkPost.user_id == g.user.id).first()
             if d_p:
                 for field in form:
                     if field.data == None:
@@ -449,7 +482,7 @@ def edit_drink(drink_id):
         return render_template("/edit-drink.html", form=form, drink=drink)
 
 
-@app.route("/<int:drink_id>/delete")
+@app.route("/delete/<int:drink_id>")
 def delete_drink(drink_id):
     """If author is g.user delete drink and redirect to profile"""
 
@@ -468,34 +501,6 @@ def delete_drink(drink_id):
     else:
         flash("Sorry, only the author of this drink post can delete it!", "danger")
         return redirect(f"/")
-
-
-@app.route("/<int:drink_id>")
-def show_drink_details(drink_id):
-    """Show details for a specific drink"""
-
-    drink = Drink.query.get_or_404(drink_id)
-    ingredients = drink.ingredients
-
-    return render_template(
-        "drink-details.html",
-        drink=drink,
-        ingredients=ingredients,
-        User=User,
-        Ingredient=Ingredient,
-        DrinkPost=DrinkPost,
-        len=len,
-    )
-
-
-@app.route("/drinks/<int:category_id>")
-def show_category_drinks(category_id):
-    """Show all drinks in a category"""
-
-    category = Category.query.get_or_404(category_id)
-    drinks = category.drinks
-
-    return render_template("drinks.html", drinks=drinks, title=f"{category.name}")
 
 
 @app.route("/search", methods=["POST"])
