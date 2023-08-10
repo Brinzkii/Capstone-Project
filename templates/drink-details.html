@@ -23,17 +23,17 @@
 		{% endif %}
 		{% if g.user and check_favorites(drink, g.favorites) %}
 			<div class="row container justify-content-center mx-auto mb-1 p-0">
-				<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-center pb-0 pt-0 mt-2 mb-2 col-2 dislike"><i class="bi bi-heart"></i></a>
+				<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-center pb-0 pt-0 mt-2 mb-2 col-3 dislike"><i class="bi bi-heart"></i></a>
 			</div>
 			{% elif g.user %}
 			<div class="row container justify-content-center mx-auto mb-1 p-0">
-				<a href="/{{drink.id}}/favorite/add" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-2 like"><i class="bi bi-heart"></i></a>
+				<a href="/{{drink.id}}/favorite/add" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-3 like"><i class="bi bi-heart"></i></a>
 			</div>
 		{% endif %}
 		{% if g.user %}
 		<div class="row container-fluid justify-content-center m-0 p-0 text-center">
-			<h6 class="card-subtitle mb-1 col-3">Likes: {{len(drink.favorites)}}</h6>
-			<h6 class="card-subtitle mb-1 col-3">Comments: {{len(drink.comments)}}</h6>
+			<h6 class="card-subtitle mb-1 col-5">Likes: {{len(drink.favorites)}}</h6>
+			<h6 class="card-subtitle mb-1 col-5">Comments: {{len(drink.comments)}}</h6>
 		</div>
 		{% endif %}
 		<img src="{{drink.main_img}}" class="card-img" alt="..." />
@@ -46,7 +46,7 @@
 			{% if i.description %}
 
 			<li class="list-group-item mb-0">
-				<a class="ing-item text-white" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
+				<a class="ing-item text-primary" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
 					{{i.name}} - {{ingredient.measurement}}
 				</a>
 			</li>
@@ -88,7 +88,7 @@
 	<div class="card-body pt-2">
 		<h4 class="card-title text-center">Comments</h4>
 		{% if g.user %}
-		<h6 class="text-center mb-3"><a href="/{{drink.id}}/comment/add" class="btn btn-sm btn-success">Add</a></h6>
+		<h6 class="text-center mb-3"><a href="/{{drink.id}}/comment/add" class="btn btn-success">Add</a></h6>
 		{% endif %} {% if drink.comments %}
 		<ul class="list-group">
 			{% for comment in drink.comments %} {% set u = User.query.get_or_404(comment.user_id) %}
@@ -100,10 +100,13 @@
 				{% endif %}
 				<p class="card-text mr-5">{{comment.comment}}</p>
 				<small><a href="/profile/{{u.id}}">- {{u.username}}</a></small>
+				<small></small>
 			</li>
 			<hr />
-			{% endfor %} {% else %}
+			{% endfor %} {% elif g.user %}
 			<p class="card-text text-center">No comments have been added yet, you should be the first!</p>
+			{% else %}
+			<p class="card-text text-center">No comments have been added yet, <a href="/signup">sign up</a> or <a href="/login">login</a> to be the first!</p>
 			{% endif %}
 		</ul>
 	</div>

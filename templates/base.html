@@ -66,18 +66,18 @@
 							</li>
 						</ul>
 					</div>
-					<div class="container-fluid search justify-content-end flex-nowrap pr-0 pl-0">
+					<div class="container-fluid search justify-content-end pr-0 pl-0">
 						{% if g.user %}
-						<form method="POST" id="search_form" action="/search" class="form-inline flex-shrink-1">
+						<form method="POST" id="search_form" action="/search" class="form-inline col-12">
 							{{ search_form.hidden_tag() }} {% for field in search_form if field.widget.input_type !=
 							'hidden' %} {% for error in field.errors %}
 							<span class="text-danger">{{ error }}</span>
-							{% endfor %} {{ field(placeholder=field.label.text, class="form-control") }} {% endfor %}
+							{% endfor %} {{ field(placeholder=field.label.text, class="form-control col-8") }} {% endfor %}
 
-							<button class="btn btn-secondary ml-1">Search</button>
+							<button class="btn btn-secondary ml-1 col-3">Search</button>
 						</form>
 
-							<a href="/logout" class="btn btn-warning text-center ml-3 mr-0 justify-content-end">Logout</a>
+							<a href="/logout" class="btn btn-warning text-center justify-content-end logout">Logout</a>
 
 						{% else %}
 
@@ -92,13 +92,8 @@
 		</nav>
 
 		{% for category, message in get_flashed_messages(with_categories=True) %}
-		<div class="alert alert-dismissable alert-{{ category }} mx-auto text-center mb-0 mt-2 pb-1 pt-0 pl-0 pr-0">
-			<div class="row container justify-content-start pl-0 pt-0 mb-1 mx-auto">
-				<button type="button" class="btn btn-close" data-bs-theme="dark" data-bs-dismiss="alert">
-					<i class="bi bi-x-lg" style="position: absolute;"></i>
-			</div>
-			<h5 class="alert-heading mt-0 pb-1 pl-2 pr-2">{{message}}</h3>
-			<!-- <p class="mb-0">{{message}}</p> -->
+		<div class="alert alert-dismissable alert-{{ category }} mx-auto text-center mb-0 mt-2 pb-0 pt-0 pl-0 pr-0">
+			<h5 class="alert-heading mt-0 pb-2 pt-1 pl-2 pr-2">{{message}}</h3>
 		</div>
 		{% endfor %} {% block content %} {% endblock %}
 

@@ -74,21 +74,26 @@ $('#ingredients_form').on('click', '.bi-dash-circle', function(evt) {
 
 // Move search bar and logout, login and signup buttons to center
 // when nav not collapsed
-
+let clickable = true;
 $('body').on('click', '.navbar-toggler-icon', function(evt) {
-	// evt.preventDefault();
+	let btn = $(evt.target);
+	btn.attr('disabled', true)
 	let classes = $('button.navbar-toggler').attr('class');
-	
 
-	if (classes.search('collapsed'))  {
-		$('div.search').toggleClass('justify-content-end');
-		$('div.search').toggleClass('justify-content-center');
-	} else {
-		setTimeout(() => {
-			console.log
+	while (clickable == true) {
+		clickable = false;
+
+		if (classes.search('collapsed'))  {
 			$('div.search').toggleClass('justify-content-end');
 			$('div.search').toggleClass('justify-content-center');
-		}, 2000);
+		} else {
+			setTimeout(() => {
+				$('div.search').toggleClass('justify-content-end');
+				$('div.search').toggleClass('justify-content-center');
+			}, 2000);
+		}
 	}
+	
+		
 });
 

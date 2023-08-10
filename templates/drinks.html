@@ -3,7 +3,7 @@
 <h2 class="text-center mt-2">{{title}}</h2>
 
 {% if g.user %}
-	<h5 class="text-center mt-2">
+	<h5 class="text-center mt-2 add-msg">
 		Are we missing your favorite drink? Do everybody a favor and add it!&emsp;--->&emsp;
 		<a href="/drinks/add" class="btn btn-primary">Get Started</a>
 	</h5>
@@ -14,7 +14,7 @@
 	{% set drink_loop = loop %}
 	{% if drink_loop.index >= 51 %}
 
-	<div class="card card-small text-white bg-secondary text-center col-5 mt-4 ml-1 mr-1" style="display: none;">
+	<div class="card card-small text-white bg-secondary text-center col-12 mt-4 ml-1 mr-1" style="display: none;">
 		<div class="card-body pb-1 pl-0 pr-0">
 			<h4 class="card-title mb-1">{{drink.name}}</h4>
 			{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post = DrinkPost.query.filter_by(drink_id=drink.id).first() %}
@@ -50,7 +50,7 @@
 
 	{% else %}
 
-		<div class="card card-small text-white bg-secondary text-center col-5 mt-4 ml-1 mr-1">
+		<div class="card card-small text-white bg-secondary text-center col-12 mt-4 ml-1 mr-1">
 			<div class="card-body pb-1 pl-0 pr-0">
 				<h4 class="card-title mb-1">{{drink.name}}</h4>
 				{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post = DrinkPost.query.filter_by(drink_id=drink.id).first() %}
@@ -91,31 +91,33 @@
 
 {% if len(drinks) > 50 %}
 
-	<ul class="pagination pagination-lg mx-auto col-12 justify-content-center mt-3 pr-0">
-	{% if ((len(drinks) - 1) / 50) is even %}
-	{% set stop_at = len(drinks) / 50 %}
-	{% else %}
-	{% set stop_at = math.ceil(len(drinks) / 50) %}
-	{% endif %}
-	{% for drink in drinks %}
-	{% set page_loop = loop %}
-	{% if page_loop.index < stop_at and page_loop.index == 1 %}	  		
-		
-		<li class="page-item active">
-			<a class="page-link page-link-num" href="#">{{page_loop.index}}</a>
-		</li>
+	<div id="paginator">
+		<ul class="pagination pagination-lg mx-auto col-12 justify-content-center mt-3 pr-0">
+		{% if ((len(drinks) - 1) / 50) is even %}
+		{% set stop_at = len(drinks) / 50 %}
+		{% else %}
+		{% set stop_at = math.ceil(len(drinks) / 50) %}
+		{% endif %}
+		{% for drink in drinks %}
+		{% set page_loop = loop %}
+		{% if page_loop.index < stop_at and page_loop.index == 1 %}	  		
+			
+			<li class="page-item active">
+				<a class="page-link page-link-num" href="#">{{page_loop.index}}</a>
+			</li>
 
-	{% elif page_loop.index <= stop_at and page_loop.index <= 10 %}	  		
-		
-		<li class="page-item">
-				<a class="page-link page-link-num" href="">{{page_loop.index}}</a>
-		</li>
+		{% elif page_loop.index <= stop_at and page_loop.index <= 10 %}	  		
+			
+			<li class="page-item">
+					<a class="page-link page-link-num" href="">{{page_loop.index}}</a>
+			</li>
 
-	{% endif %}
+		{% endif %}
 
-	{% endfor  %}
+		{% endfor  %}
 
-	</ul>
+		</ul>
+	</div>
 
 {% endif %}
 

@@ -64,6 +64,53 @@ div.alert {
     border-radius: .08cm;
 }
 
-ul.nav {
+/* ul.nav {
     list-style-type: none;
+} */
+
+.pagination {
+    white-space: nowrap;
+}
+#paginator {
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+#paginator > li {
+    display: inline-block;
+}
+
+
+
+/* Responsive Queries for mobile */
+
+/* Extra small - default bootstrap breakpoint */
+
+@media only screen and (max-width: 575px) {
+    h5.add-msg {
+        line-height: 25px;
+    }
+
+    a.btn-primary {
+        margin-top: 5px;
+    }
+
+    a.logout {
+        margin-top: 23px;
+        margin-bottom: 5px;
+    }
+
+    form#search_form {
+        margin-top: 15px;
+    }
+}
+
+/* Applies to small breakpoint */
+
+@media only screen and (max-width: 767px) {
+
+}
+
+@media only screen and (max-width: px) {
+    
 }

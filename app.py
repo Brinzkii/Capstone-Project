@@ -423,7 +423,7 @@ def add_ingredients(drink_id):
             d_p = DrinkPost.query.filter(DrinkPost.drink_id == d.id, DrinkPost.user_id == g.user.id).first()
             if d_p:
                 for field in form:
-                    if field.data == None:
+                    if field.data == 'None':
                         flash(
                             f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
                             "success",
@@ -473,30 +473,37 @@ def edit_drink(drink_id):
 
     if form.validate_on_submit():
         if g.user:
-            if DrinkPost.query.filter(
-                DrinkPost.drink_id == drink_id, DrinkPost.user_id == g.user.id
-            ).first():
-                drink.name = form.name.data or drink.name
-                drink.category_id = form.category_id.data or drink.category_id
-                drink.glass_id = form.glass_id.data or drink.glass_id
-                drink.instructions = form.instructions.data or drink.instructions
-                drink.main_img = form.main_img.data or drink.main_img
-                drink.thumbnail = form.thumbnail.data or drink.main_img
-                drink.video = form.video.data or drink.video
+            if form.category_id.data != 'None' and form.glass_id.data != 'None':
+                if DrinkPost.query.filter(
+                    DrinkPost.drink_id == drink_id, DrinkPost.user_id == g.user.id
+                ).first():
+                    drink.name = form.name.data or drink.name
+                    drink.category_id = form.category_id.data or drink.category_id
+                    drink.glass_id = form.glass_id.data or drink.glass_id
+                    drink.instructions = form.instructions.data or drink.instructions
+                    drink.main_img = form.main_img.data or drink.main_img
+                    drink.thumbnail = form.thumbnail.data or drink.main_img
+                    drink.video = form.video.data or drink.video
 
-                db.session.add(drink)
-                db.session.commit()
+                    db.session.add(drink)
+                    db.session.commit()
 
-                flash("Your changes have been saved!", "success")
-                return redirect(f"/{drink.id}")
+                    flash("Your changes have been saved!", "success")
+                    return redirect(f"/{drink.id}")
+                else:
+                    flash("Sorry, only the author of this drink post can make edits!", "danger")
+                    return redirect(f"/")
             else:
-                flash("Sorry, only the author of this drink post can make edits!", "danger")
-                return redirect(f"/")
+                flash(
+                    "A category and glass must be selected before adding a drink!",
+                    "warning",
+                )
+                return render_template("edit-drink.html", form=form, drink=drink)
         else:
             flash('You must be logged in to access this feature!', 'warning')
             return redirect('/')
     else:
-        return render_template("/edit-drink.html", form=form, drink=drink)
+        return render_template("edit-drink.html", form=form, drink=drink)
 
 
 @app.route("/delete/<int:drink_id>")
