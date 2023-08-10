@@ -480,8 +480,8 @@ def edit_drink(drink_id):
                 drink.category_id = form.category_id.data or drink.category_id
                 drink.glass_id = form.glass_id.data or drink.glass_id
                 drink.instructions = form.instructions.data or drink.instructions
-                drink.thumbnail = form.thumbnail.data or drink.thumbnail
                 drink.main_img = form.main_img.data or drink.main_img
+                drink.thumbnail = form.thumbnail.data or drink.thumbnail or drink.main_img
                 drink.video = form.video.data or drink.video
 
                 db.session.add(drink)
