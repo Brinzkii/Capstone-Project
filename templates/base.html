@@ -68,7 +68,7 @@
 					</div>
 					<div class="container-fluid search justify-content-end pr-0 pl-0">
 						{% if g.user %}
-						<form method="POST" id="search_form" action="/search" class="form-inline col-12">
+						<form method="POST" id="search_form" action="/search" class="col-12 col-lg-8">
 							{{ search_form.hidden_tag() }} {% for field in search_form if field.widget.input_type !=
 							'hidden' %} {% for error in field.errors %}
 							<span class="text-danger">{{ error }}</span>

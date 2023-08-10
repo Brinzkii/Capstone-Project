@@ -27,7 +27,7 @@ i.bi-plus-lg:hover {
     color: #5cb85c;
 }
 
-i:hover {
+i:hover, a.ing-item {
     cursor: pointer;
 }
 
@@ -64,10 +64,6 @@ div.alert {
     border-radius: .08cm;
 }
 
-/* ul.nav {
-    list-style-type: none;
-} */
-
 .pagination {
     white-space: nowrap;
 }
@@ -87,6 +83,7 @@ div.alert {
 /* Extra small - default bootstrap breakpoint */
 
 @media only screen and (max-width: 575px) {
+
     h5.add-msg {
         line-height: 25px;
     }
@@ -102,15 +99,22 @@ div.alert {
 
     form#search_form {
         margin-top: 15px;
+        display: flex;
+        flex-flow: nowrap;
     }
 }
 
-/* Applies to small breakpoint */
+/* Applies to large breakpoint */
 
-@media only screen and (max-width: 767px) {
+@media only screen and (min-width: 1400px) {
 
-}
+    form#search_form {
+        display: flex;
+        flex-flow: nowrap;
+        padding-right: 5px;
+    }
 
-@media only screen and (max-width: px) {
-    
+    div.card-small {
+        margin-bottom: 25px;
+    }
 }

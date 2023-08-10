@@ -1,15 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="card text-white bg-secondary mx-auto mt-2" style="width: 85%">
-	<!-- {% if g.user %} {% if check_favorites(drink, g.favorites) %}
-	<div class="row container justify-content-start pl-4 mb-1">
-		<a href="/{{drink.id}}/favorite/delete"><i class="bi bi-heart-fill" style="position: absolute"></i></a>
-	</div>
-	{% else %}
-	<div class="row container justify-content-start pl-4 mb-1">
-		<a href="/{{drink.id}}/favorite/add"><i class="bi bi-heart" style="position: absolute"></i></a>
-	</div>
-	{% endif %} {% endif %} -->
+<div class="card text-white bg-secondary mx-auto mt-2 col-12 col-lg-5">
 	<div class="card-body">
 		<h2 class="card-title text-center mb-1">{{drink.name}}</h2>
 		{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post =
@@ -84,7 +75,7 @@
 	</div>
 </div>
 
-<div class="card mx-auto mt-4 mb-2" style="width: 85%">
+<div class="card mx-auto mt-4 mb-2 col-12 col-lg-5">
 	<div class="card-body pt-2">
 		<h4 class="card-title text-center">Comments</h4>
 		{% if g.user %}
