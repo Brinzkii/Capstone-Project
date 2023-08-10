@@ -367,7 +367,7 @@ def add_drink():
 
     if form.validate_on_submit():
         if g.user:
-            if form.category_id.data != None and form.glass_id.data != None:
+            if form.category_id.data != 'None' and form.glass_id.data != 'None':
                 # Create drink from form and add to db
                 d = Drink(
                     name=form.name.data,
@@ -397,7 +397,7 @@ def add_drink():
                     "A category and glass must be selected before adding a drink!",
                     "warning",
                 )
-                return redirect("/drinks/add")
+                return render_template("add-drink.html", form=form)
         else:
             flash('You must be logged in to add a drink!', 'warning')
             return redirect('/login')
