@@ -1,11 +1,30 @@
-function hide_extra_ingredient_fields() {
-	for (let i = 2; i <= 15; i++) {
-		$(`#ingredient${i}`).hide();
-		$(`#measurement${i}`).hide();
+function show_next_results(btn) {
+	let page = btn.text();
+	let results = $('.card-small');
+	console.log(btn.text());
+	
+	$('.disabled').toggleClass('disabled')
+	$(results).hide();
+	$('.active').toggleClass('active')
+	$(btn).parent().toggleClass('active')
+
+	let low = (page * 50) - 49;
+	let high = (page * 50)
+	
+	for (let i = low; i <= high; i++) {
+		$(results[i]).show()
 	}
+
+	$(window).scrollTop(0);
+	
 }
 
-hide_extra_ingredient_fields();
+$('body').on('click', '.page-link-num', function(evt) {
+	evt.preventDefault();
+	let btn = $(evt.target);
+	
+	show_next_results(btn);
+});
 
 function add_ingredient_fields() {
 	let bottom = $('input.ing-form:visible').last();

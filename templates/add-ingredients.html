@@ -4,11 +4,30 @@
 	<div class="col-md-7 col-lg-5">
 		<h2 class="mb-2">Add {{drink.name}} Ingredients and Measurements</h2>
 		<form method="POST" id="ingredients_form">
-			{{ form.hidden_tag() }} {% for field in form if field.widget.input_type != 'hidden' %} {% for error in
-			field.errors %}
+			{{ form.hidden_tag() }}
+
+			{% for field in form if field.widget.input_type != 'hidden' %} 
+			{% set field_loop = loop %}
+			{% if field_loop.index >= 5 %}
+
+			{% for error in field.errors %}
 			<span class="text-danger">{{ error }}</span>
-			{% endfor %} {{ field(placeholder=field.label.text, class="form-control mb-1 ing-form") }} {% endfor %}
-			<li></li> <a href="#"><i class="bi bi-plus-lg"></i></a>
+			{% endfor %}
+
+			{{ field(placeholder=field.label.text, class="form-control mb-1 ing-form", style='display:none;') }}
+
+			{% else %}
+			
+			{% for error in field.errors %}
+			<span class="text-danger">{{ error }}</span>
+			{% endfor %}
+
+			{{ field(placeholder=field.label.text, class="form-control mb-1 ing-form") }}
+			
+			{% endif %}
+
+			{% endfor %}
+			<a href="#"><i class="bi bi-plus-lg"></i></a>
 			<br />
 			<button class="btn btn-success mt-2">Finish Drink</button>
 		</form>

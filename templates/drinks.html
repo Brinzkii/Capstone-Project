@@ -11,8 +11,46 @@
 
 <div class="container-fluid d-flex flex-wrap justify-content-around" style="width: 100%">
 	{% for drink in drinks %}
+	{% set drink_loop = loop %}
+	{% if drink_loop.index >= 51 %}
 
-		<div class="card text-white bg-secondary text-center col-5 mt-4 ml-1 mr-1">
+	<div class="card card-small text-white bg-secondary text-center col-5 mt-4 ml-1 mr-1" style="display: none;">
+		<div class="card-body pb-1 pl-0 pr-0">
+			<h4 class="card-title mb-1">{{drink.name}}</h4>
+			{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post = DrinkPost.query.filter_by(drink_id=drink.id).first() %}
+				<h6 class="card-subtitle text-center mb-1">
+					Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
+				</h6>
+				<h6 class="card-subtitle mb-3 text-center">({{drink.category.name}})</h6>
+			{% else %}
+				<h6 class="card-subtitle mb-3 text-center">({{drink.category.name}})</h6>
+			{% endif %}
+			{% if g.user %}
+			<div class="row container-fluid justify-content-between text-center m-0 p-0">
+				<h6 class="card-subtitle mb-0 col-6"><small>Likes: {{len(drink.favorites)}}</small></h6>
+				<h6 class="card-subtitle mb-0 col-6"><small>Comments: {{len(drink.comments)}}</small></h6>
+			</div>
+			{% endif %}
+		</div>
+		<img src="{{drink.main_img}}" class="card-img-bottom" alt="#" />
+		{% if g.user and check_favorites(drink, g.favorites) %}
+		<div class="row container justify-content-around mx-auto p-0">
+			<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-5 dislike"><i class="bi bi-heart"></i></a>
+			<a href="/{{drink.id}}" class="btn btn-info mt-2 mb-2 ml-2 col-5 align-self-center">Details</a>
+		</div>
+		{% elif g.user %}
+		<div class="row container justify-content-around mx-auto p-0">
+			<a href="/{{drink.id}}/favorite/add" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-5 like"><i class="bi bi-heart"></i></a>
+			<a href="/{{drink.id}}" class="btn btn-info mt-2 mb-2 ml-2 col-5 align-self-center">Details</a>
+		</div>
+		{% else %}
+		<a href="/{{drink.id}}" class="btn btn-info mt-2 mb-2">Details</a>
+		{% endif %}
+	</div>
+
+	{% else %}
+
+		<div class="card card-small text-white bg-secondary text-center col-5 mt-4 ml-1 mr-1">
 			<div class="card-body pb-1 pl-0 pr-0">
 				<h4 class="card-title mb-1">{{drink.name}}</h4>
 				{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post = DrinkPost.query.filter_by(drink_id=drink.id).first() %}
@@ -46,7 +84,39 @@
 			{% endif %}
 		</div>
 
+	{% endif %}
 	{% endfor %}
+
 </div>
+
+{% if len(drinks) > 50 %}
+
+	<ul class="pagination pagination-lg mx-auto col-12 justify-content-center mt-3 pr-0">
+	{% if ((len(drinks) - 1) / 50) is even %}
+	{% set stop_at = len(drinks) / 50 %}
+	{% else %}
+	{% set stop_at = math.ceil(len(drinks) / 50) %}
+	{% endif %}
+	{% for drink in drinks %}
+	{% set page_loop = loop %}
+	{% if page_loop.index < stop_at and page_loop.index == 1 %}	  		
+		
+		<li class="page-item active">
+			<a class="page-link page-link-num" href="#">{{page_loop.index}}</a>
+		</li>
+
+	{% elif page_loop.index <= stop_at and page_loop.index <= 10 %}	  		
+		
+		<li class="page-item">
+				<a class="page-link page-link-num" href="">{{page_loop.index}}</a>
+		</li>
+
+	{% endif %}
+
+	{% endfor  %}
+
+	</ul>
+
+{% endif %}
 
 {% endblock %}

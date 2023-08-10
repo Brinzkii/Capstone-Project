@@ -5,6 +5,7 @@ import os
 import random
 import time
 import schedule
+import math
 from models import (
     connect_db,
     db,
@@ -26,11 +27,12 @@ from forms import (
     DrinkForm,
     IngredientsForm,
     CommentForm,
-)
+) 
 
 app = Flask(__name__)
 
 CURR_USER_KEY = ""
+RESULTS = ''
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL", "postgresql:///capstone"
@@ -80,6 +82,12 @@ def inject_len():
 
     return dict(len=len)
 
+@app.context_processor
+def inject_math():
+    """Make math library available globally"""
+
+    return dict(math=math)
+
 
 def check_favorites(drink, favorites):
     """Checks a drink against list of favorite drinks"""
@@ -107,8 +115,7 @@ def add_favorites_to_g():
     if g.user:
         favorites = []
         for favs in g.user.favorites:
-            fav_drink = Drink.query.get_or_404(favs.drink_id)
-            favorites.append(fav_drink)
+            favorites.append(favs.drink)
         g.favorites = favorites
     else:
         g.favorites = None
@@ -527,7 +534,7 @@ def show_search_results():
         if g.user:
             q = form.search.data
             results = get_search_results(q)
-
+            
             return render_template(
                 "drinks.html",
                 drinks=results,
@@ -556,7 +563,6 @@ def get_search_results(q):
                 if drink.drink != None:
                     results.append(drink.drink)
 
-    print(results)
     # Search for any matching categories
     categories = Category.query.filter(Category.name.ilike(f"%{q}%")).all()
     # Add drinks in matching category to results
@@ -566,7 +572,6 @@ def get_search_results(q):
                 if drink != None and drink not in results:
                     results.append(drink)
 
-    print(results)
     # Search for any matching drinks and add to results
     drinks = Drink.query.filter(Drink.name.ilike(f"%{q}%")).all()
     if drinks:
@@ -574,5 +579,4 @@ def get_search_results(q):
             if drink != None and drink not in results:
                 results.append(drink)
 
-    print(results)
     return results
