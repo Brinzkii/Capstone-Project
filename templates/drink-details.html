@@ -37,11 +37,46 @@
 		</div>
 		{% endif %}
 		<img src="{{drink.main_img}}" class="card-img" alt="..." />
-		<h5 class="card-subtitle mt-3 mb-0">Glass: {{drink.glass.name}}</h5>
+		<h5 class="card-subtitle mt-3 title-und mb-0">{{drink.glass.name}}</h5>
 		<ul class="list-group">
 			<h5 class="card-subtitle title-und mt-3">Ingredients:</h5>
 			{% for ingredient in ingredients %} {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
-			<li class="list-group-item mb-0">{{i.name}} - {{ingredient.measurement}}</li>
+			{% set ing_loop = loop %}
+
+			{% if i.description %}
+
+			<li class="list-group-item mb-0">
+				<a class="ing-item text-white" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
+					{{i.name}} - {{ingredient.measurement}}
+				</a>
+			</li>
+
+			<div class="modal fade" id="ingModal{{ing_loop.index}}" tabindex="-1" aria-labelledby="Ingredient Label" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+				  <div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="modalLabel">{{i.name}}</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<h6 class="modal-title fs-5" id="modalLabel">ABV: {{i.abv}}</h6>
+					  <img class="img-fluid" src="{{i.img}}" alt="">
+					</div>
+					<div class="modal-footer">
+						<h6 class="modal-title fs-5" id="ModalLabel">{{i.description}}</h6>
+					</div>
+				  </div>
+				</div>
+			  </div> 
+			  
+			{% else %}
+
+			  	<li class="list-group-item text-white mb-0">
+					{{i.name}} - {{ingredient.measurement}}
+				</li>
+
+			{% endif %}
+			
 			{% endfor %}
 		</ul>
 		<h5 class="card-subtitle title-und mt-1 mb-3">Instructions:</h5>
