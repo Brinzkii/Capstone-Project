@@ -11,8 +11,10 @@
 				{% endfor %} {{ field(placeholder=field.label.text, class="form-control", rows='5') }} {% endfor %}
 			</div>
 
-			<a href="/profile/{{g.user.id}}" class="btn btn-warning mt-2">Cancel</a>
-			<button class="btn btn-success mt-2">Submit Changes</button>
+			<div class="container-fluid row justify-content-center text-center mx-auto">
+				<a href="/profile/{{g.user.id}}" class="btn btn-warning mt-2 mr-3">Cancel</a>
+				<button class="btn btn-success mt-2 ml-3">Submit Changes</button>
+			</div>
 		</form>
 	</div>
 </div>

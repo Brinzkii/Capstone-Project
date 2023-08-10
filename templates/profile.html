@@ -14,7 +14,9 @@
 			<li class="list-group-item">
 				<h6>{{drink.name}}</h6>
 				{% if g.user.username == user.username %}
-				<a href="/{{drink.id}}/favorite/delete" class="btn btn-sm btn-danger text-center">Remove</a>
+				<div class="container-fluid row justify-content-center pr-0 pl-0 mr-0 ml-0">
+					<a href="/{{drink.id}}/favorite/delete" class="btn btn-sm btn-danger text-center">Remove</a>
+				</div>
 				<br />
 				<br />
 				{% endif %}
@@ -27,14 +29,20 @@
 	</div>
 
 	<div class="mt-5 col-4 text-center">
-		<h4>Drink Posts</h4>
+		<h4>Drink Posts 
+			{% if g.user.username == user.username %}
+			<a href="/drinks/add" class="ml-2"><i class="bi bi-plus-lg"></i></a>
+			{% endif %}
+		</h4>
 		<ul id="post-list" class="list-group">
 			{% for drink in posts %}
 			<li class="list-group-item">
 				<h6>{{drink.name}}</h6>
 				{% if g.user.username == user.username %}
-				<a href="/{{drink.id}}/edit" class="btn btn-sm btn-warning text-center">Edit</a>
-				<a href="/delete/{{drink.id}}" class="btn btn-sm btn-danger text-center">Delete</a>
+				<div class="container-fluid row justify-content-center pr-0 pl-0 mr-0 ml-0">
+					<a href="/{{drink.id}}/edit" class="btn btn-sm btn-warning text-center mr-3">Edit</a>
+					<a href="/delete/{{drink.id}}" class="btn btn-sm btn-danger text-center ml-3">Delete</a>
+				</div>
 				<br />
 				<br />
 				{% endif %}
