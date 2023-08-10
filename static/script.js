@@ -1,3 +1,6 @@
+// Add event listener to pagination buttons
+// and show / hide proper results when clicked (50 per page)
+
 function show_next_results(btn) {
 	let page = btn.text();
 	let results = $('.card-small');
@@ -26,6 +29,9 @@ $('body').on('click', '.page-link-num', function(evt) {
 	show_next_results(btn);
 });
 
+// Listen for when plus button is clicked on ingredients form and add 
+// another field 
+
 function add_ingredient_fields() {
 	let bottom = $('input.ing-form:visible').last();
 	let del_btn = $('<i></i>');
@@ -39,6 +45,8 @@ function add_ingredient_fields() {
 	hide_if_no_more();
 }
 
+// Hide plus button once all fields are visible
+
 function hide_if_no_more() {
 	if ($('.ing-form:hidden').length === 0) {
 		$('.bi-plus-lg').hide();
@@ -46,6 +54,8 @@ function hide_if_no_more() {
 }
 
 $('.bi-plus-lg').on('click', add_ingredient_fields);
+
+// Button for removing optional ingredient fields after being added
 
 function remove_ingredient_fields(btn) {
 	let next = $(btn.next());
@@ -62,6 +72,8 @@ $('#ingredients_form').on('click', '.bi-dash-circle', function(evt) {
 	remove_ingredient_fields(btn);
 });
 
+// Move search bar and logout, login and signup buttons to center
+// when nav not collapsed
 
 $('body').on('click', '.navbar-toggler-icon', function(evt) {
 	// evt.preventDefault();
