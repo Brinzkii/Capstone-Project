@@ -28,7 +28,7 @@ Seeding the database takes awhile due to the number of requests necessary and th
 
 -  All tests can be run with 'python -m unittest'
 
-- Specific test files can be run with 'python -m unittest <file name.py>'
+- Specific test files can be run with 'python -m unittest file_name.py'
 
 ## Usage
 
