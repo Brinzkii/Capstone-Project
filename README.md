@@ -14,11 +14,13 @@ Cocktail recipe database driven website using https://www.thecocktaildb.com/api.
 
 -   Start databases with 'sudo service postgresql start'
 
--   Create database 'capstone'
+-   Create database with 'createdb capstone'
 
 ## Seeding
 
 Seeding the database takes awhile due to the number of requests necessary and the delay needed between each to get successful responses. Be prepared to wait 30 minutes - you will get status updates via the console throughout the process
+
+-   Create database with 'createdb capstone-test'
 
 -   Run ipython
 
