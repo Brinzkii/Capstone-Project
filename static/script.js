@@ -61,3 +61,22 @@ $('#ingredients_form').on('click', '.bi-dash-circle', function(evt) {
 	
 	remove_ingredient_fields(btn);
 });
+
+
+$('body').on('click', '.navbar-toggler-icon', function(evt) {
+	// evt.preventDefault();
+	let classes = $('button.navbar-toggler').attr('class');
+	
+
+	if (classes.search('collapsed'))  {
+		$('div.search').toggleClass('justify-content-end');
+		$('div.search').toggleClass('justify-content-center');
+	} else {
+		setTimeout(() => {
+			console.log
+			$('div.search').toggleClass('justify-content-end');
+			$('div.search').toggleClass('justify-content-center');
+		}, 2000);
+	}
+});
+
