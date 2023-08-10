@@ -374,8 +374,8 @@ def add_drink():
                     category_id=form.category_id.data,
                     glass_id=form.glass_id.data,
                     instructions=form.instructions.data,
-                    thumbnail=form.thumbnail.data,
                     main_img=form.main_img.data,
+                    thumbnail=form.thumbnail.data or form.main_img.data,
                     video=form.video.data,
                 )
 
