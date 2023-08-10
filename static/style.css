@@ -35,7 +35,7 @@ i.bi-dash-circle {
     font-size: 1.35rem;
 }
 
-i.bi-dash-circle:hover {
+i.bi-dash-circle:hover, i.bi-trash:hover {
     color: #d9534f;
 }
 
