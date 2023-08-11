@@ -90,6 +90,26 @@ div.alert {
     }
 }
 
+/* Applies to small breakpoint */
+
+@media only screen and (min-width: 576px) and (max-width: 1399px) {
+    form#search_form {
+        margin-top: 15px;
+        display: flex;
+        flex-flow: nowrap;
+    }
+
+    a.logout {
+        margin-top: 23px;
+        margin-bottom: 5px;
+    }
+
+    div.card-small {
+        margin-bottom: 25px;
+    }
+}
+
+
 /* Applies to large breakpoint */
 
 @media only screen and (min-width: 1400px) {
