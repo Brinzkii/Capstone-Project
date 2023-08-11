@@ -365,44 +365,48 @@ def add_drink():
     ]
     form.glass_id.choices.insert(0, (None, "Select the glass"))
 
-    if form.validate_on_submit():
-        if g.user:
-            if form.category_id.data != 'None' and form.glass_id.data != 'None':
-                # Create drink from form and add to db
-                d = Drink(
-                    name=form.name.data,
-                    category_id=form.category_id.data,
-                    glass_id=form.glass_id.data,
-                    instructions=form.instructions.data,
-                    main_img=form.main_img.data,
-                    thumbnail=form.thumbnail.data or form.main_img.data,
-                    video=form.video.data,
-                )
+    try:
+        if form.validate_on_submit():
+            if g.user:
+                if form.category_id.data != 'None' and form.glass_id.data != 'None':
+                    # Create drink from form and add to db
+                    d = Drink(
+                        name=form.name.data,
+                        category_id=form.category_id.data,
+                        glass_id=form.glass_id.data,
+                        instructions=form.instructions.data,
+                        main_img=form.main_img.data,
+                        thumbnail=form.thumbnail.data or form.main_img.data,
+                        video=form.video.data,
+                    )
 
-                db.session.add(d)
-                db.session.commit()
+                    db.session.add(d)
+                    db.session.commit()
 
-                dp = DrinkPost(user_id=g.user.id, drink_id=d.id)
+                    dp = DrinkPost(user_id=g.user.id, drink_id=d.id)
 
-                db.session.add(dp)
-                db.session.commit()
+                    db.session.add(dp)
+                    db.session.commit()
 
-                flash(
-                    "Please enter a minimum of two drink ingredients and their measurements to complete the process. If optional measurements/ingredients are missing their conterpart, they will be ignored.",
-                    "info",
-                )
-                return redirect(f"/{d.id}/ingredients/add")
+                    flash(
+                        "Please enter a minimum of two drink ingredients and their measurements to complete the process. If optional measurements/ingredients are missing their conterpart, they will be ignored.",
+                        "info",
+                    )
+                    return redirect(f"/{d.id}/ingredients/add")
+                else:
+                    flash(
+                        "A category and glass must be selected before adding a drink!",
+                        "warning",
+                    )
+                    return render_template("add-drink.html", form=form)
             else:
-                flash(
-                    "A category and glass must be selected before adding a drink!",
-                    "warning",
-                )
-                return render_template("add-drink.html", form=form)
+                flash('You must be logged in to add a drink!', 'warning')
+                return redirect('/login')
         else:
-            flash('You must be logged in to add a drink!', 'warning')
-            return redirect('/login')
-    else:
-        return render_template("add-drink.html", form=form)
+            return render_template("add-drink.html", form=form)
+    except IntegrityError:
+        flash('Sorry, that drink name is taken!', 'warning')
+        return redirect('/drinks/add')
 
 
 @app.route("/<int:drink_id>/ingredients/add", methods=["GET", "POST"])
@@ -432,23 +436,30 @@ def add_ingredients(drink_id):
                         if d_i:
                             d_i.measurement = field.data
                             db.session.add(d_i)
-                            db.session.commit()
                             d_i = None
 
                     elif field.data in bad_ans and count >= 5:
                         print(f'idx = {count}, data = {field.data}')
                         if count == 5:
+                            db.session.commit()
                             flash(f'{d.name} has been added, thanks for your contribution!', 'success')
                             return redirect(f"/{d.id}")
                     
                         elif count % 2 == 0:
+                            db.session.rollback()
                             flash('Each ingredient must have a measurement!', 'warning')
                             return redirect(f'/{d.id}/ingredients/add')
+                        else:
+                            db.session.commit()
+                            flash(f'{d.name} has been added, thanks for your contribution!', 'success')
+                            return redirect(f"/{d.id}")
 
                     else:
+                        db.session.rollback()
                         flash('Minimum of two ingredients and measurements for a new drink!', 'warning')
                         return redirect(f'/{d.id}/ingredients/add')
             else:
+                db.session.rollback()
                 flash('You must be the author of the drink to edit ingredients!', 'danger')
                 return redirect('/')
         else:

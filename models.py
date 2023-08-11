@@ -190,7 +190,7 @@ class DrinkPost(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"))
 
-    drink_id = db.Column(db.Integer, db.ForeignKey("drinks.id", ondelete="CASCADE"))
+    drink_id = db.Column(db.Integer, db.ForeignKey("drinks.id"))
 
     user = db.relationship("User", backref="drinkposts")
 
