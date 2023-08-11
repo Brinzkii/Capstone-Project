@@ -91,7 +91,6 @@
 
 {% if len(drinks) > 50 %}
 
-	<div id="paginator">
 		<ul class="pagination pagination-lg mx-auto col-12 justify-content-center mt-3 pr-0">
 		{% if ((len(drinks) - 1) / 50) is even %}
 		{% set stop_at = len(drinks) / 50 %}
@@ -117,7 +116,6 @@
 		{% endfor  %}
 
 		</ul>
-	</div>
 
 {% endif %}
 

@@ -64,20 +64,6 @@ div.alert {
     border-radius: .08cm;
 }
 
-.pagination {
-    white-space: nowrap;
-}
-#paginator {
-    overflow-x: scroll;
-    overflow-y: hidden;
-}
-
-#paginator > li {
-    display: inline-block;
-}
-
-
-
 /* Responsive Queries for mobile */
 
 /* Extra small - default bootstrap breakpoint */

@@ -97,3 +97,8 @@ $('body').on('click', '.navbar-toggler-icon', function(evt) {
 		
 });
 
+// If on mobile toggle smaller pagination element
+if ($('body').width() < 1400) {
+	$('ul.pagination').toggleClass('pagination-lg');
+}
+
