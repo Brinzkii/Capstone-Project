@@ -7,7 +7,7 @@
 </div>
 
 <div class="container-fluid row mx-auto justify-content-around align-content-start">
-	<div class="mt-5 col-12 text-center">
+	<div class="mt-5 col-12 col-lg-5 text-center">
 		<h4>Favorite Drinks</h4>
 		<ul id="fav-list" class="list-group">
 			{% for drink in favorites %}
@@ -28,7 +28,7 @@
 		</ul>
 	</div>
 
-	<div class="mt-5 col-12 text-center">
+	<div class="mt-5 col-12 col-lg-5 text-center">
 		<h4>Drink Posts 
 			{% if g.user.username == user.username %}
 			<a href="/drinks/add" class="ml-2"><i class="bi bi-plus-lg"></i></a>
