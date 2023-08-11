@@ -409,7 +409,7 @@ def add_drink():
 def add_ingredients(drink_id):
     """Add ingredients and measurements to go with new drink (max 15 ingredient-measurement pairs)"""
     d = Drink.query.get_or_404(drink_id)
-    bad_ans = ['None', None]
+    bad_ans = ['None', None, '']
 
     form = IngredientsForm()
     for field in form:
@@ -436,13 +436,14 @@ def add_ingredients(drink_id):
                             d_i = None
 
                     elif field.data in bad_ans and count >= 5:
-                        if count % 2 == 0:
+                        print(f'idx = {count}, data = {field.data}')
+                        if count == 5:
+                            flash(f'{d.name} has been added, thanks for your contribution!', 'success')
+                            return redirect(f"/{d.id}")
+                    
+                        elif count % 2 == 0:
                             flash('Each ingredient must have a measurement!', 'warning')
                             return redirect(f'/{d.id}/ingredients/add')
-                    
-                        else:
-                            flash('Each measurement must have an ingredient!', 'warning')
-                            return redirect(f"/{d.id}/ingredients/add")
 
                     else:
                         flash('Minimum of two ingredients and measurements for a new drink!', 'warning')
