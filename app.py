@@ -388,7 +388,7 @@ def add_drink():
                 db.session.commit()
 
                 flash(
-                    "Please enter the drink ingredients and their measurements to complete the process.",
+                    "Please enter a minimum of two drink ingredients and their measurements to complete the process. If optional measurements/ingredients are missing their conterpart, they will be ignored.",
                     "info",
                 )
                 return redirect(f"/{d.id}/ingredients/add")
@@ -409,7 +409,7 @@ def add_drink():
 def add_ingredients(drink_id):
     """Add ingredients and measurements to go with new drink (max 15 ingredient-measurement pairs)"""
     d = Drink.query.get_or_404(drink_id)
-    
+    bad_ans = ['None', None]
 
     form = IngredientsForm()
     for field in form:
@@ -419,32 +419,34 @@ def add_ingredients(drink_id):
         field.choices[0] = (None, "Select an ingredient")
 
     if form.validate_on_submit():
+        count = 0
         if g.user:
             d_p = DrinkPost.query.filter(DrinkPost.drink_id == d.id, DrinkPost.user_id == g.user.id).first()
             if d_p:
                 for field in form:
-                    if field.data == 'None':
-                        flash(
-                            f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
-                            "success",
-                        )
-                        return redirect(f"/{d.id}")
-
-                    elif "ingredient" in field.id and field.data:
+                    count += 1
+                    if "ingredient" in field.id and field.data not in bad_ans:
                         d_i = DrinkIngredients(drink_id=d.id, ingredient_id=field.data)
 
-                    elif "measurement" in field.id and field.data:
+                    elif "measurement" in field.id and field.data not in bad_ans:
                         if d_i:
                             d_i.measurement = field.data
                             db.session.add(d_i)
                             db.session.commit()
                             d_i = None
 
-                flash(
-                    f"{d.name} has now been added, thanks for your contribution {g.user.username}!",
-                    "success",
-                )
-                return redirect(f"/{d.id}")
+                    elif field.data in bad_ans and count >= 5:
+                        if count % 2 == 0:
+                            flash('Each ingredient must have a measurement!', 'warning')
+                            return redirect(f'/{d.id}/ingredients/add')
+                    
+                        else:
+                            flash('Each measurement must have an ingredient!', 'warning')
+                            return redirect(f"/{d.id}/ingredients/add")
+
+                    else:
+                        flash('Minimum of two ingredients and measurements for a new drink!', 'warning')
+                        return redirect(f'/{d.id}/ingredients/add')
             else:
                 flash('You must be the author of the drink to edit ingredients!', 'danger')
                 return redirect('/')
