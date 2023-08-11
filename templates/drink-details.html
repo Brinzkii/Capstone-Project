@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="card text-white bg-secondary mx-auto mt-2 col-12 col-lg-5">
+<div class="card text-white bg-secondary mx-auto mt-2 col-12 col-md-8 col-lg-6">
 	<div class="card-body">
 		<h2 class="card-title text-center mb-1">{{drink.name}}</h2>
 		{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post =
@@ -75,7 +75,7 @@
 	</div>
 </div>
 
-<div class="card mx-auto mt-4 mb-2 col-12 col-lg-5">
+<div class="card mx-auto mt-4 mb-2 col-12 col-md-8 col-lg-6">
 	<div class="card-body pt-2">
 		<h4 class="card-title text-center">Comments</h4>
 		{% if g.user %}
