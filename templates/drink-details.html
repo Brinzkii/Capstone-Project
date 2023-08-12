@@ -7,7 +7,7 @@
 			{% set post = DrinkPost.query.filter_by(drink_id=drink.id).first() %}
 
 			{% if check_author(post) %}
-			<h2 class="card-title text-center mb-2"><a href="/{{drink.id}}/edit"><i class="bi bi-pencil-square mr-1"></i></a> {{drink.name}}</h2>
+			<h2 class="card-title text-center mb-2 pr-4"><a href="/{{drink.id}}/edit"><i class="bi bi-pencil-square mr-1"></i></a> {{drink.name}}</h2>
 			{% else %}
 			<h2 class="card-title text-center mb-2">{{drink.name}}</h2>
 			{% endif %}
@@ -37,8 +37,8 @@
 
 			{% if g.user %}
 			<div class="row container-fluid justify-content-center m-0 p-0 text-center">
-				<h6 class="card-subtitle mb-1 col-5">Likes: {{len(drink.favorites)}}</h6>
-				<h6 class="card-subtitle mb-1 col-5">Comments: {{len(drink.comments)}}</h6>
+				<h6 class="card-subtitle mb-1 col-5 col-lg-3">Likes: {{len(drink.favorites)}}</h6>
+				<h6 class="card-subtitle mb-1 col-5 col-lg-3">Comments: {{len(drink.comments)}}</h6>
 			</div>
 			{% endif %}
 
