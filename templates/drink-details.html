@@ -2,9 +2,16 @@
 
 <div class="card text-white bg-secondary mx-auto mt-2 col-12 col-md-8 col-lg-6">
 	<div class="card-body">
-		<h2 class="card-title text-center mb-2">{{drink.name}}</h2>
+	
 		{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post =
 		DrinkPost.query.filter_by(drink_id=drink.id).first() %}
+
+		{% if check_author(post) %}
+		<h2 class="card-title text-center mb-2"><a href="/{{drink.id}}/edit"><i class="bi bi-pencil-square mr-1"></i></a> {{drink.name}}</h2>
+		{% else %}
+		<h2 class="card-title text-center mb-2">{{drink.name}}</h2>
+		{% endif %}
+
 		<h5 class="card-subtitle text-center mb-1">
 			Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
 		</h5>

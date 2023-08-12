@@ -42,7 +42,6 @@ class DrinkForm(FlaskForm):
     glass_id = SelectField("Glass", validators=[DataRequired()])
     instructions = TextAreaField("Instructions", validators=[DataRequired()])
     main_img = StringField("Main Image (url)", validators=[DataRequired()])
-    thumbnail = StringField("Thumbnail (url - optional)")
     video = StringField("Video (url - optional)")
 
 

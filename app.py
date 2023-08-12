@@ -356,7 +356,7 @@ def add_drink():
                         glass_id=form.glass_id.data,
                         instructions=form.instructions.data,
                         main_img=form.main_img.data,
-                        thumbnail=form.thumbnail.data or form.main_img.data,
+                        thumbnail=form.main_img.data,
                         video=form.video.data,
                     )
 
@@ -477,7 +477,7 @@ def edit_drink(drink_id):
                     drink.glass_id = form.glass_id.data or drink.glass_id
                     drink.instructions = form.instructions.data or drink.instructions
                     drink.main_img = form.main_img.data or drink.main_img
-                    drink.thumbnail = form.thumbnail.data or drink.main_img
+                    drink.thumbnail = form.main_img.data or drink.main_img
                     drink.video = form.video.data or drink.video
 
                     db.session.add(drink)
