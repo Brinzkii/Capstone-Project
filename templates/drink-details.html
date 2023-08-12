@@ -114,6 +114,9 @@
 		</ul>
 		<h5 class="card-subtitle title-und mt-1 mb-3">Instructions:</h5>
 		<p class="card-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{drink.instructions}}</p>
+		{% if drink.video %}
+		<h5 class="card-subtitle title-und mt-2 mb-2"><a href="{{drink.video}}">Video</a></h5>
+		{% endif %}
 	</div>
 </div>
 
