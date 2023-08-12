@@ -3,8 +3,6 @@ from better_profanity import profanity
 from sqlalchemy.exc import IntegrityError
 import os
 import random
-import time
-import schedule
 import math
 from models import (
     connect_db,
@@ -33,7 +31,6 @@ from forms import (
 app = Flask(__name__)
 
 CURR_USER_KEY = ""
-RESULTS = ''
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL", "postgresql:///capstone"
@@ -49,7 +46,7 @@ connect_db(app)
 
 @app.context_processor
 def inject_data():
-    """Make categories, posts, form available globally"""
+    """Make categories, posts, search form available in all templates"""
 
     categories = Category.query.order_by(Category.name).all()
     search_form = SearchForm()
@@ -57,7 +54,7 @@ def inject_data():
 
 @app.context_processor
 def inject_funcs():
-
+    """Make functions available in all templates"""
 
     return dict(check_favorites=check_favorites, check_author=check_author, len=len, math=math)
 
@@ -93,10 +90,7 @@ def add_user_to_g():
 def add_favorites_to_g():
     """If global user exists add favorite drink objects to global"""
     if g.user:
-        favorites = []
-        for favs in g.user.favorites:
-            favorites.append(favs.drink)
-        g.favorites = favorites
+        g.favorites = [favs.drink for favs in g.user.favorites]
     else:
         g.favorites = None
 
@@ -116,9 +110,8 @@ def sess_logout():
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
 
-
 def get_random_drink():
-    """Every 24hrs pick a new drink from database and add to global"""
+    """Return a random drink from database"""
 
     drinks = Drink.query.all()
     idx = random.randint(0, len(drinks) - 1)
@@ -128,7 +121,7 @@ def get_random_drink():
 
 @app.route("/")
 def show_home():
-    """Show homepage - if logged in showcase daily random drink"""
+    """Show homepage - if logged in showcase random drink"""
 
     if g.user:
         drink = get_random_drink()

@@ -1,10 +1,16 @@
 {% extends 'base.html' %} {% block content %} {% if g.user %}
 
+{% set post = DrinkPost.query.filter_by(drink_id=drink.id).first() %}
+
 <div class="container-fluid" style="width: 85%">
 	<div class="card text-center justify-content-center text-dark bg-light mt-5 mb-2 mx-auto">
-		<div class="card-header"><h1>Drink of the Day!</h1></div>
 		<div class="card-body">
-			<h3 class="card-title mb-1">{{drink.name}}</h3>
+			<h2 class="card-title mb-1">{{drink.name}}</h2>
+			{% if post %}
+			<h6 class="card-subtitle text-center mb-1">
+				Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
+			</h6>
+			{% endif %}
 			<h6 class="card-subtitle mb-3">Category: {{drink.category.name}}</h6>
 			<div class="row container-fluid justify-content-center text-center">
 				<h6 class="card-subtitle mb-1 col-6">Likes: {{len(drink.favorites)}}</h6>
