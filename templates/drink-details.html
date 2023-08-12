@@ -3,106 +3,110 @@
 <div class="card text-white bg-secondary mx-auto mt-2 col-12 col-md-8 col-lg-6">
 	<div class="card-body">
 	
-		{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post =
-		DrinkPost.query.filter_by(drink_id=drink.id).first() %}
+		{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %}
+			{% set post = DrinkPost.query.filter_by(drink_id=drink.id).first() %}
 
-		{% if check_author(post) %}
-		<h2 class="card-title text-center mb-2"><a href="/{{drink.id}}/edit"><i class="bi bi-pencil-square mr-1"></i></a> {{drink.name}}</h2>
-		{% else %}
-		<h2 class="card-title text-center mb-2">{{drink.name}}</h2>
-		{% endif %}
-
-		<h5 class="card-subtitle text-center mb-1">
-			Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
-		</h5>
-		<h5 class="card-subtitle mb-1 text-center">({{drink.category.name}})</h5>
-		<h5 class="card-subtitle mb-2 text-center">{{drink.glass.name}}</h5>
-
-		{% else %}
-		<h5 class="card-subtitle mb-1 text-center">({{drink.category.name}})</h5>
-		<h5 class="card-subtitle mb-2 text-center">{{drink.glass.name}}</h5>
-		{% endif %}
-		{% if g.user and check_favorites(drink, g.favorites) %}
-			<div class="row container justify-content-center mx-auto mb-1 p-0">
-				<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-center pb-0 pt-0 mt-2 mb-2 col-3 dislike"><i class="bi bi-heart"></i></a>
-			</div>
-			{% elif g.user %}
-			<div class="row container justify-content-center mx-auto mb-1 p-0">
-				<a href="/{{drink.id}}/favorite/add" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-3 like"><i class="bi bi-heart"></i></a>
-			</div>
-		{% endif %}
-		{% if g.user %}
-		<div class="row container-fluid justify-content-center m-0 p-0 text-center">
-			<h6 class="card-subtitle mb-1 col-5">Likes: {{len(drink.favorites)}}</h6>
-			<h6 class="card-subtitle mb-1 col-5">Comments: {{len(drink.comments)}}</h6>
-		</div>
-		{% endif %}
-		<img src="{{drink.main_img}}" class="card-img" alt="..." />
-		<ul class="list-group">
 			{% if check_author(post) %}
-			<h5 class="card-subtitle title-und mt-3">Ingredients: <a href="/{{drink.id}}/ingredients/add"><i class="bi bi-plus text-success"></i></a></h5>
+			<h2 class="card-title text-center mb-2"><a href="/{{drink.id}}/edit"><i class="bi bi-pencil-square mr-1"></i></a> {{drink.name}}</h2>
 			{% else %}
-			<h5 class="card-subtitle title-und mt-3">Ingredients:</h5>
+			<h2 class="card-title text-center mb-2">{{drink.name}}</h2>
 			{% endif %}
-			{% for ingredient in ingredients %} {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
-			{% set ing_loop = loop %}
 
-			{% if i.description %}
+			<h5 class="card-subtitle text-center mb-1">
+				Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
+			</h5>
+			<h5 class="card-subtitle mb-1 text-center">({{drink.category.name}})</h5>
+			<h5 class="card-subtitle mb-2 text-center">{{drink.glass.name}}</h5>
 
-			<li class="list-group-item mb-0">
-				{% if check_author(post) %}
-
-				<a class="ing-item text-primary" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
-					{{i.name}} - {{ingredient.measurement}}
-					<a href="/{{drink.id}}/{{i.id}}/edit" class="btn btn-sm"><i class="bi bi-pencil-square ml-2"></i></a>
-					<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-danger"></i></a>
-				</a>
-				
-
-				{% else %}
-
-				<a class="ing-item text-primary" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
-					{{i.name}} - {{ingredient.measurement}}
-				</a>
-
-				{% endif %}
-			</li>
-
-			<div class="modal fade" id="ingModal{{ing_loop.index}}" tabindex="-1" aria-labelledby="Ingredient Label" aria-hidden="true">
-				<div class="modal-dialog modal-dialog-centered">
-				  <div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="modalLabel">{{i.name}}</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<h6 class="modal-title fs-5" id="modalLabel">ABV: {{i.abv}}</h6>
-					  <img class="img-fluid" src="{{i.img}}" alt="">
-					</div>
-					<div class="modal-footer">
-						<h6 class="modal-title fs-5" id="ModalLabel">{{i.description}}</h6>
-					</div>
-				  </div>
+			{% else %}
+			<h2 class="card-title text-center mb-2">{{drink.name}}</h2>
+			<h5 class="card-subtitle mb-1 text-center">({{drink.category.name}})</h5>
+			<h5 class="card-subtitle mb-2 text-center">{{drink.glass.name}}</h5>
+		{% endif %}
+			{% if g.user and check_favorites(drink, g.favorites) %}
+				<div class="row container justify-content-center mx-auto mb-1 p-0">
+					<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-center pb-0 pt-0 mt-2 mb-2 col-3 dislike"><i class="bi bi-heart"></i></a>
 				</div>
-			  </div> 
-			  
-			{% else %}
-				{% if check_author(post) %}
-				<li class="list-group-item text-white mb-0">
-					{{i.name}} - {{ingredient.measurement}} 
+				{% elif g.user %}
+				<div class="row container justify-content-center mx-auto mb-1 p-0">
+					<a href="/{{drink.id}}/favorite/add" class="btn btn-outline-light align-self-center pb-0 pt-0 mt-2 mb-2 mr-2 col-3 like"><i class="bi bi-heart"></i></a>
+				</div>
+			{% endif %}
+
+			{% if g.user %}
+			<div class="row container-fluid justify-content-center m-0 p-0 text-center">
+				<h6 class="card-subtitle mb-1 col-5">Likes: {{len(drink.favorites)}}</h6>
+				<h6 class="card-subtitle mb-1 col-5">Comments: {{len(drink.comments)}}</h6>
+			</div>
+			{% endif %}
+
+			<img src="{{drink.main_img}}" class="card-img" alt="..." />
+			<ul class="list-group">
+				{% if post and check_author(post) %}
+				<h5 class="card-subtitle title-und mt-3">Ingredients: <a href="/{{drink.id}}/ingredients/add"><i class="bi bi-plus text-success"></i></a></h5>
+				{% else %}
+				<h5 class="card-subtitle title-und mt-3">Ingredients:</h5>
+				{% endif %}
+				{% for ingredient in ingredients %} {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
+				{% set ing_loop = loop %}
+
+				{% if i.description %}
+
+				<li class="list-group-item mb-0">
+					{% if post and check_author(post) %}
+
+					<a class="ing-item text-info mr-1" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
+						<i class="bi bi-info-circle"></i>
+					</a>
+					{{i.name}} - {{ingredient.measurement}}
 					<a href="/{{drink.id}}/{{i.id}}/edit" class="btn btn-sm"><i class="bi bi-pencil-square ml-2"></i></a>
 					<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-danger"></i></a>
+
+					{% else %}
+
+					<a class="ing-item text-info mr-1" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
+						<i class="bi bi-info-circle"></i>
+					</a>
+					{{i.name}} - {{ingredient.measurement}}
+
+					{% endif %}
 				</li>
+
+				<div class="modal fade" id="ingModal{{ing_loop.index}}" tabindex="-1" aria-labelledby="Ingredient Label" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="modalLabel">{{i.name}}</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<h6 class="modal-title fs-5" id="modalLabel">ABV: {{i.abv}}</h6>
+						<img class="img-fluid" src="{{i.img}}" alt="">
+						</div>
+						<div class="modal-footer">
+							<h6 class="modal-title fs-5" id="ModalLabel">{{i.description}}</h6>
+						</div>
+					</div>
+					</div>
+				</div> 
 				
 				{% else %}
+					{% if post and check_author(post) %}
+					<li class="list-group-item text-white mb-0">
+						{{i.name}} - {{ingredient.measurement}} 
+						<a href="/{{drink.id}}/{{i.id}}/edit" class="btn btn-sm"><i class="bi bi-pencil-square ml-2"></i></a>
+						<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-danger"></i></a>
+					</li>
+					
+					{% else %}
 
-			  	<li class="list-group-item text-white mb-0">
-					{{i.name}} - {{ingredient.measurement}}
-				</li>
+					<li class="list-group-item text-white mb-0">
+						{{i.name}} - {{ingredient.measurement}}
+					</li>
+
+					{% endif %}
 
 				{% endif %}
-
-			{% endif %}
 			
 			{% endfor %}
 		</ul>

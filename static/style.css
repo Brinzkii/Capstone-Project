@@ -47,6 +47,10 @@ i.bi-x-lg {
     position: fixed;
 }
 
+a.text-info:hover {
+text-decoration: none;
+}
+
 .title-und {
     text-decoration: underline;
 }
