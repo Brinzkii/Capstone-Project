@@ -13,7 +13,7 @@ from models import (
     User,
     Drink,
     Ingredient,
-    DrinkIngredients,
+    DrinkIngredient,
     Glass,
     Category,
     Favorite,
@@ -26,6 +26,7 @@ from forms import (
     SearchForm,
     DrinkForm,
     IngredientsForm,
+    EditDrinkIngredientForm,
     CommentForm,
 ) 
 
@@ -46,47 +47,19 @@ connect_db(app)
 
 #################################### App Setup Routes ####################################
 
-
 @app.context_processor
-def inject_categories():
-    """Make categories available in base template for use in header"""
+def inject_data():
+    """Make categories, posts, form available globally"""
 
     categories = Category.query.order_by(Category.name).all()
-    return dict(categories=categories)
-
-
-@app.context_processor
-def inject_drink_post():
-    """Make posts available in base template for use globally"""
-
-    return dict(DrinkPost=DrinkPost)
-
-
-@app.context_processor
-def inject_search_form():
-    """Make search form available in base template for use in header"""
-
     search_form = SearchForm()
-    return dict(search_form=search_form)
-
-
-@app.context_processor
-def inject_check_favorites():
-    """Make function for checking drink against favorites available globally"""
-
-    return dict(check_favorites=check_favorites)
+    return dict(categories=categories, DrinkPost=DrinkPost, search_form=search_form)
 
 @app.context_processor
-def inject_len():
-    """Make length function available globally"""
+def inject_funcs():
 
-    return dict(len=len)
 
-@app.context_processor
-def inject_math():
-    """Make math library available globally"""
-
-    return dict(math=math)
+    return dict(check_favorites=check_favorites, check_author=check_author, len=len, math=math)
 
 
 def check_favorites(drink, favorites):
@@ -98,6 +71,13 @@ def check_favorites(drink, favorites):
 
     return False
 
+def check_author(post):
+    """Checks if current user is author of drink"""
+
+    if g.user == post.user:
+        return True
+    else:
+        return False
 
 @app.before_request
 def add_user_to_g():
@@ -430,7 +410,7 @@ def add_ingredients(drink_id):
                 for field in form:
                     count += 1
                     if "ingredient" in field.id and field.data not in bad_ans:
-                        d_i = DrinkIngredients(drink_id=d.id, ingredient_id=field.data)
+                        d_i = DrinkIngredient(drink_id=d.id, ingredient_id=field.data)
 
                     elif "measurement" in field.id and field.data not in bad_ans:
                         if d_i:
@@ -567,6 +547,46 @@ def delete_drink(drink_id):
     else:
         flash('You must be logged in to access this feature!', 'warning')
         return redirect('/')
+
+
+@app.route('/<int:drink_id>/<int:ingredient_id>/edit', methods=['GET', 'POST'])
+def edit_drink_ingredient(drink_id, ingredient_id):
+    """If author is g.user edit drink ingredient and redirect to drink page"""
+    
+    d_i = DrinkIngredient.query.filter(DrinkIngredient.drink_id == drink_id, DrinkIngredient.ingredient_id == ingredient_id).first()
+    drink = Drink.query.get_or_404(drink_id)
+    form = EditDrinkIngredientForm(obj=d_i)
+    form.ingredient_id.choices = [
+            (i.id, i.name) for i in Ingredient.query.order_by(Ingredient.name).all()
+        ]
+    form.ingredient_id.choices[0] = (None, "Select an ingredient")
+
+    if form.validate_on_submit():
+        if g.user:
+            post = DrinkPost.query.filter(
+                DrinkPost.drink_id == drink_id, DrinkPost.user_id == g.user.id
+            ).first()
+
+            if post:
+                if form.ingredient_id.data == 'None': form.ingredient_id.data = d_i.ingredient.id
+
+                d_i.ingredient_id = form.ingredient_id.data
+                d_i.measurement = form.measurement.data
+
+                db.session.commit()
+
+                flash(f'{drink.name} has been updated!', 'success')
+                return redirect(f'/{drink.id}')
+            else:
+                flash("Sorry, only the author of this drink can edit ingredients!", "danger")
+                return redirect(f"/")
+        else:
+            flash('You must be logged in to access this feature!', 'warning')
+            return redirect('/')
+    else:
+        return render_template('edit-ingredient.html', form=form, drink=drink)
+    
+
 
 
 @app.route("/search", methods=["POST"])

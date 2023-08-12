@@ -2,15 +2,18 @@
 
 <div class="card text-white bg-secondary mx-auto mt-2 col-12 col-md-8 col-lg-6">
 	<div class="card-body">
-		<h2 class="card-title text-center mb-1">{{drink.name}}</h2>
+		<h2 class="card-title text-center mb-2">{{drink.name}}</h2>
 		{% if DrinkPost.query.filter_by(drink_id=drink.id).first() %} {% set post =
 		DrinkPost.query.filter_by(drink_id=drink.id).first() %}
 		<h5 class="card-subtitle text-center mb-1">
 			Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
 		</h5>
-		<h5 class="card-subtitle mb-2 text-center">({{drink.category.name}})</h5>
+		<h5 class="card-subtitle mb-1 text-center">({{drink.category.name}})</h5>
+		<h5 class="card-subtitle mb-2 text-center">{{drink.glass.name}}</h5>
+
 		{% else %}
-		<h5 class="card-subtitle mb-2 text-center">({{drink.category.name}})</h5>
+		<h5 class="card-subtitle mb-1 text-center">({{drink.category.name}})</h5>
+		<h5 class="card-subtitle mb-2 text-center">{{drink.glass.name}}</h5>
 		{% endif %}
 		{% if g.user and check_favorites(drink, g.favorites) %}
 			<div class="row container justify-content-center mx-auto mb-1 p-0">
@@ -28,7 +31,6 @@
 		</div>
 		{% endif %}
 		<img src="{{drink.main_img}}" class="card-img" alt="..." />
-		<h5 class="card-subtitle mt-3 title-und mb-0">{{drink.glass.name}}</h5>
 		<ul class="list-group">
 			<h5 class="card-subtitle title-und mt-3">Ingredients:</h5>
 			{% for ingredient in ingredients %} {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
@@ -37,9 +39,22 @@
 			{% if i.description %}
 
 			<li class="list-group-item mb-0">
+				{% if check_author(post) %}
+
+				<a class="ing-item text-primary" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
+					{{i.name}} - {{ingredient.measurement}}
+					<a href="/{{drink.id}}/{{i.id}}/edit" class="btn btn-sm"><i class="bi bi-pencil-square ml-2"></i></a>
+					<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-white"></i></a>
+				</a>
+				
+
+				{% else %}
+
 				<a class="ing-item text-primary" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
 					{{i.name}} - {{ingredient.measurement}}
 				</a>
+
+				{% endif %}
 			</li>
 
 			<div class="modal fade" id="ingModal{{ing_loop.index}}" tabindex="-1" aria-labelledby="Ingredient Label" aria-hidden="true">
@@ -61,10 +76,20 @@
 			  </div> 
 			  
 			{% else %}
+				{% if check_author(post) %}
+				<li class="list-group-item text-white mb-0">
+					{{i.name}} - {{ingredient.measurement}} 
+					<a href="/{{drink.id}}/{{i.id}}/edit" class="btn btn-sm"><i class="bi bi-pencil-square ml-2"></i></a>
+					<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-white"></i></a>
+				</li>
+				
+				{% else %}
 
 			  	<li class="list-group-item text-white mb-0">
 					{{i.name}} - {{ingredient.measurement}}
 				</li>
+
+				{% endif %}
 
 			{% endif %}
 			

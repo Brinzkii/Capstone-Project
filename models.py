@@ -127,7 +127,7 @@ class Category(db.Model):
     name = db.Column(db.String, unique=True)
 
 
-class DrinkIngredients(db.Model):
+class DrinkIngredient(db.Model):
     """Ties ingredients and their measurements to specific cocktails"""
 
     __tablename__ = "drink_ingredients"

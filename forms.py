@@ -81,6 +81,13 @@ class IngredientsForm(FlaskForm):
     measurement15 = StringField("Measurement")
 
 
+class EditDrinkIngredientForm(FlaskForm):
+    """Form for editing an ingredient for specific drink"""
+
+    ingredient_id = SelectField("Ingredient", validators=[DataRequired()])
+    measurement = StringField("Measurement", validators=[DataRequired()])
+
+
 class CommentForm(FlaskForm):
     """Form for adding comment to drink recipe"""
 
