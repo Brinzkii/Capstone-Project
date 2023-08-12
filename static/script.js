@@ -102,3 +102,15 @@ if ($('body').width() < 1400) {
 	$('ul.pagination').toggleClass('pagination-lg');
 }
 
+
+// Trigger share menu when share button clicked
+$('body').on('click', 'a.share', function(evt) {
+	if (navigator.share) {
+		navigator.share({
+			title: $('h2.card-title').text(),
+			text: 'Check out this drink on Underground Mixology!',
+			url: $(location).attr('href')
+		})
+	}
+})
+
