@@ -49,8 +49,9 @@ def inject_data():
     """Make categories, posts, search form available in all templates"""
 
     categories = Category.query.order_by(Category.name).all()
+    glasses = Glass.query.order_by(Glass.name).all()
     search_form = SearchForm()
-    return dict(categories=categories, DrinkPost=DrinkPost, search_form=search_form)
+    return dict(categories=categories, glasses=glasses, DrinkPost=DrinkPost, search_form=search_form)
 
 @app.context_processor
 def inject_funcs():
@@ -313,7 +314,7 @@ def show_drink_details(drink_id):
     )
 
 
-@app.route("/drinks/<int:category_id>")
+@app.route("/drinks/category/<int:category_id>")
 def show_category_drinks(category_id):
     """Show all drinks in a category"""
 
@@ -321,6 +322,16 @@ def show_category_drinks(category_id):
     drinks = category.drinks
 
     return render_template("drinks.html", drinks=drinks, title=f"{category.name}")
+
+
+@app.route("/drinks/glass/<int:glass_id>")
+def show_glass_drinks(glass_id):
+    """Show all drinks that use a type of glass"""
+
+    glass = Glass.query.get_or_404(glass_id)
+    drinks = glass.drinks
+
+    return render_template('drinks.html', drinks=drinks, title=f'{glass.name}')
 
 
 @app.route("/drinks/add", methods=["GET", "POST"])

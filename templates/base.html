@@ -59,7 +59,25 @@
 								<div class="dropdown-menu">
 									{% for category in categories %}
 
-									<a class="dropdown-item" href="/drinks/{{category.id}}">{{category.name}}</a>
+									<a class="dropdown-item" href="/drinks/category/{{category.id}}">{{category.name}}</a>
+
+									{% endfor %}
+								</div>
+							</li>
+							<li class="nav-item dropdown">
+								<a
+									class="nav-link dropdown-toggle text-dark"
+									data-bs-toggle="dropdown"
+									href="#"
+									role="button"
+									aria-haspopup="true"
+									aria-expanded="false"
+									>Glasses</a
+								>
+								<div class="dropdown-menu">
+									{% for glass in glasses %}
+
+									<a class="dropdown-item" href="/drinks/glass/{{glass.id}}">{{glass.name}}</a>
 
 									{% endfor %}
 								</div>
