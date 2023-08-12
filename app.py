@@ -369,9 +369,10 @@ def add_drink():
                     db.session.commit()
 
                     flash(
-                        "Please enter a minimum of two drink ingredients and their measurements to complete the process. If optional measurements/ingredients are missing their conterpart, they will be ignored.",
-                        "info",
+                        f"{d.name} has been added, now for the ingredients!",
+                        "success",
                     )
+                    flash('If optional measurements are missing their conterpart, they will be ignored.', 'info')
                     return redirect(f"/{d.id}/ingredients/add")
                 else:
                     flash(
@@ -418,9 +419,9 @@ def add_ingredients(drink_id):
                             db.session.add(d_i)
                             d_i = None
 
-                    elif field.data in bad_ans and count >= 5:
+                    elif field.data in bad_ans and count >= 3:
                         print(f'idx = {count}, data = {field.data}')
-                        if count == 5:
+                        if count == 3:
                             db.session.commit()
                             flash(f'{d.name} has been added, thanks for your contribution!', 'success')
                             return redirect(f"/{d.id}")
@@ -436,7 +437,7 @@ def add_ingredients(drink_id):
 
                     else:
                         db.session.rollback()
-                        flash('Minimum of two ingredients and measurements for a new drink!', 'warning')
+                        flash('One ingredient and measurement required!', 'warning')
                         return redirect(f'/{d.id}/ingredients/add')
             else:
                 db.session.rollback()
@@ -500,30 +501,6 @@ def edit_drink(drink_id):
         return render_template("edit-drink.html", form=form, drink=drink)
 
 
-@app.route('/cancel/<int:drink_id>')
-def cancel_submission(drink_id):
-    """Delete created drink and redirect back to profile page"""
-    if g.user:
-        drink = Drink.query.get_or_404(drink_id)
-        post = DrinkPost.query.filter(
-            DrinkPost.drink_id == drink_id, DrinkPost.user_id == g.user.id
-        ).first()
-
-        if post:
-            db.session.delete(drink)
-            db.session.delete(post)
-            db.session.commit()
-
-            flash(f"{drink.name} submission canceled!", "success")
-            return redirect(f"/profile/{g.user.id}")
-        else:
-            flash("Sorry, only the author of this drink post can do that!", "danger")
-            return redirect(f"/")
-    else:
-        flash('You must be logged in to access this feature!', 'warning')
-        return redirect('/')
-
-
 @app.route("/delete/<int:drink_id>")
 def delete_drink(drink_id):
     """If author is g.user delete drink and redirect to profile"""
@@ -547,9 +524,6 @@ def delete_drink(drink_id):
     else:
         flash('You must be logged in to access this feature!', 'warning')
         return redirect('/')
-
-
-
 
 
 @app.route('/<int:drink_id>/<int:ingredient_id>/edit', methods=['GET', 'POST'])

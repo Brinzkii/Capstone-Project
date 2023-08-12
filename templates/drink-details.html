@@ -32,7 +32,11 @@
 		{% endif %}
 		<img src="{{drink.main_img}}" class="card-img" alt="..." />
 		<ul class="list-group">
+			{% if check_author(post) %}
+			<h5 class="card-subtitle title-und mt-3">Ingredients: <a href="/{{drink.id}}/ingredients/add"><i class="bi bi-plus text-success"></i></a></h5>
+			{% else %}
 			<h5 class="card-subtitle title-und mt-3">Ingredients:</h5>
+			{% endif %}
 			{% for ingredient in ingredients %} {% set i = Ingredient.query.get_or_404(ingredient.ingredient_id) %}
 			{% set ing_loop = loop %}
 
@@ -44,7 +48,7 @@
 				<a class="ing-item text-primary" data-bs-toggle="modal" data-bs-target="#ingModal{{ing_loop.index}}">
 					{{i.name}} - {{ingredient.measurement}}
 					<a href="/{{drink.id}}/{{i.id}}/edit" class="btn btn-sm"><i class="bi bi-pencil-square ml-2"></i></a>
-					<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-white"></i></a>
+					<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-danger"></i></a>
 				</a>
 				
 
@@ -80,7 +84,7 @@
 				<li class="list-group-item text-white mb-0">
 					{{i.name}} - {{ingredient.measurement}} 
 					<a href="/{{drink.id}}/{{i.id}}/edit" class="btn btn-sm"><i class="bi bi-pencil-square ml-2"></i></a>
-					<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-white"></i></a>
+					<a href="/{{drink.id}}/{{i.id}}/delete" class="btn btn-sm"><i class="bi bi-trash text-danger"></i></a>
 				</li>
 				
 				{% else %}

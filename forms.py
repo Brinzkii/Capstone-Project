@@ -51,8 +51,8 @@ class IngredientsForm(FlaskForm):
 
     ingredient1 = SelectField("Ingredient", validators=[DataRequired()])
     measurement1 = StringField("Measurement", validators=[DataRequired()])
-    ingredient2 = SelectField("Ingredient", validators=[DataRequired()])
-    measurement2 = StringField("Measurement", validators=[DataRequired()])
+    ingredient2 = SelectField("Ingredient")
+    measurement2 = StringField("Measurement")
     ingredient3 = SelectField("Ingredient")
     measurement3 = StringField("Measurement")
     ingredient4 = SelectField("Ingredient")
