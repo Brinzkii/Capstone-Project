@@ -549,6 +549,9 @@ def delete_drink(drink_id):
         return redirect('/')
 
 
+
+
+
 @app.route('/<int:drink_id>/<int:ingredient_id>/edit', methods=['GET', 'POST'])
 def edit_drink_ingredient(drink_id, ingredient_id):
     """If author is g.user edit drink ingredient and redirect to drink page"""
@@ -587,6 +590,29 @@ def edit_drink_ingredient(drink_id, ingredient_id):
         return render_template('edit-ingredient.html', form=form, drink=drink)
     
 
+@app.route('/<int:drink_id>/<int:ingredient_id>/delete')
+def delete_drink_ingredient(drink_id, ingredient_id):
+    """If author is g.user delete drink ingredient and redirect to drink page"""
+
+    if g.user:
+        d_i = DrinkIngredient.query.filter(DrinkIngredient.drink_id == drink_id, DrinkIngredient.ingredient_id == ingredient_id).first()
+        post = DrinkPost.query.filter(
+                DrinkPost.drink_id == drink_id, DrinkPost.user_id == g.user.id
+            ).first()
+
+        if post:
+            db.session.delete(d_i)
+            db.session.commit()
+
+            flash('Ingredient has been deleted!', 'warning')
+            return redirect(f'/{drink_id}')
+        else:
+            flash("Sorry, only the author of this drink can delete ingredients!", "danger")
+            return redirect(f"/")    
+
+    else:
+        flash('You must be logged in to access this feature!', 'warning')
+        return redirect('/')
 
 
 @app.route("/search", methods=["POST"])
