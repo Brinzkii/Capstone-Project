@@ -20,17 +20,17 @@ Cocktail recipe database driven website using https://www.thecocktaildb.com/api.
 
 Seeding the database takes awhile due to the number of requests necessary and the delay needed between each to get successful responses. Be prepared to wait 30 minutes - you will get status updates via the console throughout the process
 
--   Create database with 'createdb capstone-test'
-
 -   Run ipython
 
 -   '%run seed.py'
 
 ## Testing
 
+-  Create database with 'createdb capstone-test'
+
 -  All tests can be run with 'python -m unittest'
 
-- Specific test files can be run with 'python -m unittest file_name.py'
+-  Specific test files can be run with 'python -m unittest file_name.py'
 
 ## Usage
 
