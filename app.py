@@ -111,22 +111,48 @@ def sess_logout():
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
 
-def get_random_drink():
-    """Return a random drink from database"""
+def get_random_drinks():
+    """Return 5 random drinks from database"""
+    count = 0
+    drink_list = []
 
-    drinks = Drink.query.all()
-    idx = random.randint(0, len(drinks) - 1)
+    while count < 5:
+        drinks = Drink.query.all()
+        idx = random.randint(0, len(drinks) - 1)
+        drink_list.append(drinks[idx])
+        count += 1
 
-    return drinks[idx]
+    return drink_list
+
+def get_similar_drinks():
+    """Return 5 similar drinks from database """
+    ing_list = []
+
+    # Grab ingredients and categories from favorited drinks
+    for drink in g.favorites:
+        ing_list.extend([i.id for i in DrinkIngredient.query.filter_by(drink_id=drink.id).all()])
+
+    similar = DrinkIngredient.query.filter(DrinkIngredient.ingredient_id == [ing_list]).all()
+
+    count = 0
+    drink_list = []
+    while count < 5:
+        idx = random.randint(0, len(similar) - 1)
+        drink_list.append(similar[idx])
+
+    return drink_list
 
 
 @app.route("/")
 def show_home():
     """Show homepage - if logged in showcase random drink"""
 
-    if g.user:
-        drink = get_random_drink()
-        return render_template("home.html", drink=drink)
+    if g.user and g.favorites:
+        drinks = get_random_drinks()
+        return render_template("home.html", drinks=drinks)
+    elif g.user and not g.favorites:
+        drinks = get_random_drinks()
+        return render_template("home.html", drinks=drinks)
     else:
         return render_template("home.html")
 
@@ -288,15 +314,6 @@ def delete_comment(comment_id):
 #################################### Drink Routes ####################################
 
 
-@app.route("/drinks")
-def show_drinks():
-    """Show all drinks in database"""
-
-    drinks = Drink.query.order_by(Drink.name).all()
-
-    return render_template("drinks.html", drinks=drinks, title="All Drinks")
-
-
 @app.route("/<int:drink_id>")
 def show_drink_details(drink_id):
     """Show details for a specific drink"""
@@ -359,8 +376,7 @@ def add_drink():
                         category_id=form.category_id.data,
                         glass_id=form.glass_id.data,
                         instructions=form.instructions.data,
-                        main_img=form.main_img.data,
-                        thumbnail=form.main_img.data,
+                        image=form.image.data,
                         video=form.video.data,
                     )
 
@@ -480,8 +496,7 @@ def edit_drink(drink_id):
                     drink.category_id = form.category_id.data or drink.category_id
                     drink.glass_id = form.glass_id.data or drink.glass_id
                     drink.instructions = form.instructions.data or drink.instructions
-                    drink.main_img = form.main_img.data or drink.main_img
-                    drink.thumbnail = form.main_img.data or drink.main_img
+                    drink.image = form.image.data or drink.image
                     drink.video = form.video.data or drink.video
 
                     db.session.add(drink)

@@ -1,22 +1,39 @@
 {% extends 'base.html' %} {% block content %} {% if g.user %}
 
+<!-- {% set drink = drinks[0] %} -->
+
 {% set post = DrinkPost.query.filter_by(drink_id=drink.id).first() %}
 
-<div class="container-fluid col-12 col-lg-8">
-	<div class="card text-center justify-content-center text-dark bg-light mt-5 mb-2 mx-auto">
-		<div class="card-body">
-			<h2 class="card-title mb-1">{{drink.name}}</h2>
-			{% if post %}
-			<h6 class="card-subtitle text-center mb-1">
-				Bartender: <a href="/profile/{{post.user.id}}">{{post.user.username}}</a>
-			</h6>
-			{% endif %}
-			<h6 class="card-subtitle mb-3">Category: {{drink.category.name}}</h6>
-			<div class="row container-fluid justify-content-center text-center">
-				<h6 class="card-subtitle mb-1 col-6">Likes: {{len(drink.favorites)}}</h6>
-				<h6 class="card-subtitle mb-1 col-6">Comments: {{len(drink.comments)}}</h6>
+<h2 class="text-center mt-2">Suggestions</h2>
+
+<div class="container-fluid col-12 col-lg-8 mx-auto mt-3 pt-3 pb-3 bg-light">
+	<div id="suggestionsCarousel" class="carousel slide" data-bs-ride="carousel">
+		<div class="carousel-indicators">
+			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+		</div>
+		<div class="carousel-inner">
+			{% for drink in drinks %}
+			{% set drink_loop = loop %}
+			{% if drink_loop.index == 1 %}
+			<div class="carousel-item active">
+				<div class="carousel-caption d-none d-block">
+					<h2><a href="/{{drink.id}}" class="text-white bg-dark">{{drink.name}}</a></h2>
+				</div>
+				<img src="{{drink.image}}" class="d-block img-fluid mx-auto" alt="...">
 			</div>
-			<a href="/{{drink.id}}"><img src="{{drink.image}}" class="card-img-bottom" alt="#" /></a>
+			{% else %}
+			<div class="carousel-item">
+				<div class="carousel-caption d-none d-block">
+					<h2><a href="/{{drink.id}}" class="text-white bg-dark">{{drink.name}}</a></h2>
+				</div>
+				<img src="{{drink.image}}" class="d-block img-fluid mx-auto" alt="...">
+			</div>
+			{% endif %}
+			{% endfor %}
 		</div>
 	</div>
 </div>
