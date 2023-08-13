@@ -8,13 +8,6 @@
 
 <div class="container-fluid col-12 col-lg-8 mx-auto mt-3 pt-3 pb-3 bg-light">
 	<div id="suggestionsCarousel" class="carousel slide" data-bs-ride="carousel">
-		<div class="carousel-indicators">
-			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
-			<button type="button" data-bs-target="#suggestionsCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
-		</div>
 		<div class="carousel-inner">
 			{% for drink in drinks %}
 			{% set drink_loop = loop %}
