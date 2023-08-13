@@ -130,15 +130,23 @@ def get_similar_drinks():
 
     # Grab ingredients and categories from favorited drinks
     for drink in g.favorites:
-        ing_list.extend([i.id for i in DrinkIngredient.query.filter_by(drink_id=drink.id).all()])
+        drink_ings = DrinkIngredient.query.filter_by(drink_id=drink.id).all()
+    for i in drink_ings:
+        ing_list.append(i.ingredient_id)
 
-    similar = DrinkIngredient.query.filter(DrinkIngredient.ingredient_id == [ing_list]).all()
+    similar_ingredients = DrinkIngredient.query.filter(DrinkIngredient.ingredient_id.in_(ing_list)).all()
+    similar = []
+
+    for d in similar_ingredients:
+        similar.append(d.drink_id)
 
     count = 0
     drink_list = []
     while count < 5:
         idx = random.randint(0, len(similar) - 1)
-        drink_list.append(similar[idx])
+        d = Drink.query.get_or_404(similar[idx])
+        drink_list.append(d)
+        count += 1
 
     return drink_list
 
@@ -148,7 +156,7 @@ def show_home():
     """Show homepage - if logged in showcase random drink"""
 
     if g.user and g.favorites:
-        drinks = get_random_drinks()
+        drinks = get_similar_drinks()
         return render_template("home.html", drinks=drinks)
     elif g.user and not g.favorites:
         drinks = get_random_drinks()
