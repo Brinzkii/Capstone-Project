@@ -80,9 +80,7 @@ class Drink(db.Model):
 
     instructions = db.Column(db.String)
 
-    thumbnail = db.Column(db.String)
-
-    main_img = db.Column(db.String)
+    image = db.Column(db.String)
 
     video = db.Column(db.String)
 

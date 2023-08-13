@@ -1,5 +1,5 @@
 from app import app
-from models import Drink, Ingredient, Glass, Category, DrinkIngredients, db
+from models import Drink, Ingredient, Glass, Category, DrinkIngredient, db
 from time import sleep
 from alive_progress import alive_bar
 import random
@@ -59,6 +59,7 @@ def add_ingredients():
 
     # Now query each for details and add to DB
     with alive_bar(len(ingredients), title='Adding ingredients:', length=25) as bar:
+        ing_list = []
         for ingredient in ingredients:
             resp = requests.get(base_url + "search.php", params={"i": f"{ingredient}"})
             ings = resp.json()
@@ -70,10 +71,12 @@ def add_ingredients():
                 img=f"https://www.thecocktaildb.com/images/ingredients/{ings['ingredients'][0]['strIngredient']}.png",
             )
 
-            with app.app_context():
-                db.session.add(i)
-                db.session.commit()
-                bar()
+            ing_list.append(i)
+            bar()
+
+        with app.app_context():
+            db.session.add_all(ing_list)
+            db.session.commit()
 
 
 def add_all_drinks():
@@ -81,7 +84,7 @@ def add_all_drinks():
 
     with app.app_context():
         categories = Category.query.all()
-        all_drinks = []
+        glasses = Glass.query.all()
 
         # Get a list of all drinks in a category
         with alive_bar(len(categories), length=25) as bar:
@@ -92,37 +95,65 @@ def add_all_drinks():
                 )
                 drinks = resp.json()
 
-            # Get the details of each drink in the list we just received
+                # Get the details of each drink in the list we just received
                 count = 0
+                drink_list = []
                 while count <= len(drinks["drinks"]) - 1:
                     # Create drink object
                     d = Drink(
                         name=drinks["drinks"][count]["strDrink"],
                         api_id=drinks["drinks"][count]["idDrink"],
-                        category_id=category.id,
-                        thumbnail=f"{drinks['drinks'][count]['strDrinkThumb']}/preview",
-                        main_img=drinks["drinks"][count]["strDrinkThumb"],
+                        image=drinks["drinks"][count]["strDrinkThumb"],
                     )
 
                     count += 1
+                    drink_list.append(d)
 
-                    db.session.add(d)
-                    db.session.commit()
-
+                db.session.add_all(drink_list)
+                db.session.commit()
                 bar()
 
+        # Get a list of all drinks that use a particular glass
+        with alive_bar(len(glasses), length=25) as bar:
+            for glass in glasses:
+                bar.title = f'Adding {glass.name} drinks:'
+                resp = requests.get(
+                    base_url + "filter.php", params={"g": f"{glass.name}"}
+                )
+                drinks = resp.json()
 
-def add_drink_ingredients(category_id):
+                # If drink not already in database get the details and add to database
+                count = 0
+                drink_list = []
+                while count <= len(drinks['drinks']) - 1:
+                    # Check if in database already
+                    if Drink.query.filter_by(name=drinks["drinks"][count]["strDrink"]).first():
+                        count += 1
+                    else:
+                        d = Drink(
+                        name=drinks["drinks"][count]["strDrink"],
+                        api_id=drinks["drinks"][count]["idDrink"],
+                        image=drinks["drinks"][count]["strDrinkThumb"],
+                    )
+
+                        count += 1
+                        drink_list.append(d)
+                        
+
+                db.session.add_all(drink_list)
+                db.session.commit()
+                bar()
+
+        
+
+
+def add_drink_ingredients():
     """
-    Create an entry for each ingredient tying ingredient to drink with measurement and
-    add missing details to drinks.
-
-    Must call one category at a time or the api locks up
+    Adds additional drink details and creates an entry for each ingredient tying ingredient to drink with measurement
     """
 
     with app.app_context():
-        drinks = Drink.query.filter_by(category_id=category_id).all()
-        progress = 0
+        drinks = Drink.query.all()
 
         # Get detailed info for each drink in database via API and update missing info
         with alive_bar(len(drinks), length=20, title_length=20) as bar:
@@ -146,13 +177,16 @@ def add_drink_ingredients(category_id):
                 details = resp.json()
                 data = details["drinks"][0]
                 glass = Glass.query.filter_by(name=data["strGlass"].title()).first()
+                category = Category.query.filter_by(name=data["strCategory"].title()).first()
 
                 drink.video = data["strVideo"]
+                drink.category_id = category.id
                 drink.glass_id = glass.id
                 drink.instructions = data["strInstructions"]
 
                 # Loop through ingredients and create pairs in DB, adding ingredients if they are missing
                 count = 1
+                drink_ings = []
                 while data[f"strIngredient{count}"] != None:
                     ingredient = Ingredient.query.filter_by(
                         name=data[f"strIngredient{count}"].title()
@@ -164,22 +198,23 @@ def add_drink_ingredients(category_id):
                         db.session.add(i)
                         db.session.commit()
 
-                        d_i = DrinkIngredients(
+                        d_i = DrinkIngredient(
                             drink_id=drink.id,
                             ingredient_id=i.id,
                             measurement=data[f"strMeasure{count}"],
                         )
 
-                        db.session.add(d_i)
+                        drink_ings.append(d_i)
                     else:
-                        d_i = DrinkIngredients(
+                        d_i = DrinkIngredient(
                             drink_id=drink.id,
                             ingredient_id=ingredient.id,
                             measurement=data[f"strMeasure{count}"],
                         )
 
-                        db.session.add(d_i)
+                        drink_ings.append(d_i)
 
+                    db.session.add_all(drink_ings)
                     db.session.commit()
 
                     count += 1
@@ -189,7 +224,7 @@ def add_drink_ingredients(category_id):
 add_categories()
 
 print(
-    """
+"""
 
 *********************************************************************************
 
@@ -197,14 +232,14 @@ Categories successfully stored - glasses will begin in 5 seconds
 
 *********************************************************************************
 
-      """
+"""
 )
 sleep(5)
 
 add_glasses()
 
 print(
-    """
+"""
 
 *********************************************************************************
 
@@ -212,14 +247,14 @@ Glasses successfully stored - ingredients will begin in 5 seconds
 
 *********************************************************************************
 
-      """
+"""
 )
 sleep(5)
 
 add_ingredients()
 
 print(
-    """
+"""
 
 *********************************************************************************
 
@@ -227,55 +262,31 @@ Ingredients successfully stored - drinks will begin in 5 seconds
 
 *********************************************************************************
 
-      """
+"""
 )
 sleep(5)
 
 add_all_drinks()
 
 print(
-    """
+"""
 
 *********************************************************************************
 
-Drinks successfully stored - the first category of drink details and ingredients will begin in 10 seconds
+Drinks successfully stored - Additional drink details and ingredients for all will begin in 10 seconds
 
-                                  ETA ~ 30 mins                                  
+                                  ETA ~ 35 mins                                  
 
-*********************************************************************************
-
-    """
-)
-sleep(10)
-
-with app.app_context():
-    categories = Category.query.all()
-    count = 1
-
-    for category in categories:
-        if count == len(categories):
-            add_drink_ingredients(category.id)
-        else:
-            add_drink_ingredients(category.id)
-            count += 1
-
-            print(
-                f"""
-
-*********************************************************************************
-
-{count - 1} / {len(categories)} categories complete
-
-The next category will begin in 10 seconds
-                
 *********************************************************************************
 
 """
-            )
-            sleep(10)
+)
+sleep(10)
+
+add_drink_ingredients()
 
 print(
-    """
+"""
 
 *********************************************************************************
 
@@ -283,5 +294,5 @@ Database successfully seeded!
 
 *********************************************************************************
 
-      """
+"""
 )

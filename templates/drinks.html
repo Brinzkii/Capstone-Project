@@ -32,7 +32,7 @@
 			</div>
 			{% endif %}
 		</div>
-		<img src="{{drink.main_img}}" class="card-img-bottom" alt="#" />
+		<img src="{{drink.image}}" class="card-img-bottom" alt="#" />
 		{% if g.user and check_favorites(drink, g.favorites) %}
 		<div class="row container justify-content-between mx-auto p-0">
 			<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-start pb-0 pt-0 mt-2 mb-2 mr-2 col-5 dislike"><i class="bi bi-heart"></i></a>
@@ -68,7 +68,7 @@
 				</div>
 				{% endif %}
 			</div>
-			<img src="{{drink.main_img}}" class="card-img-bottom" alt="#" />
+			<img src="{{drink.image}}" class="card-img-bottom" alt="#" />
 			{% if g.user and check_favorites(drink, g.favorites) %}
 			<div class="row container justify-content-between mx-auto p-0">
 				<a href="/{{drink.id}}/favorite/delete" class="btn btn-danger align-self-start pb-0 pt-0 mt-2 mb-2 mr-2 col-5 dislike"><i class="bi bi-heart"></i></a>
