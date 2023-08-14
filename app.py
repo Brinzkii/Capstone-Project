@@ -172,20 +172,25 @@ def signup_user():
     form = SignupForm()
 
     if form.validate_on_submit():
-        try:
-            user = User.signup(
-                username=form.username.data,
-                password=form.password.data,
-                profile_img=form.profile_img.data,
-            )
-            db.session.commit()
-            sess_login(user)
-            flash(f"Welcome to the club, {user.username}!", "success")
-            return redirect("/")
-        except IntegrityError:
-            db.session.rollback()
-            flash("Sorry, that username is already taken!", "danger")
+        if profanity.contains_profanity(form.username.data):
+            flash("Username cannot contain profanity, try again!", "danger")
             return render_template("signup.html", form=form)
+        else:
+            try:
+                user = User.signup(
+                    username=form.username.data,
+                    password=form.password.data,
+                    profile_img=form.profile_img.data,
+                )
+                db.session.commit()
+                sess_login(user)
+
+                flash(f"Welcome to the club, {user.username}!", "success")
+                return redirect("/")
+            except IntegrityError:
+                db.session.rollback()
+                flash("Sorry, that username is already taken!", "danger")
+                return render_template("signup.html", form=form)
     else:
         return render_template("signup.html", form=form)
 
@@ -383,7 +388,7 @@ def add_drink():
                         name=form.name.data,
                         category_id=form.category_id.data,
                         glass_id=form.glass_id.data,
-                        instructions=form.instructions.data,
+                        instructions=profanity.censor(form.instructions.data),
                         image=form.image.data,
                         video=form.video.data,
                     )
